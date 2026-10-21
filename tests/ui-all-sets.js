@@ -1,0 +1,11 @@
+const {JSDOM}=require('jsdom');const fs=require('fs'),os=require('os'),path=require('path');
+const html=fs.readFileSync(path.join(__dirname,'..','docs','index.html'),'utf8');
+const dom=new JSDOM(html,{runScripts:'dangerously',url:'http://localhost/x.html',beforeParse(w){w.matchMedia=()=>({matches:false});w.scrollTo=()=>{};w.Element.prototype.scrollIntoView=()=>{};w.confirm=()=>true;}});
+const w=dom.window,d=w.document,E=w.eval('EXAMS');const out=[];
+E.forEach((ex,si)=>{d.getElementById('tab'+si).click();
+  ex.questions.forEach((q,i)=>q.ans.forEach((a,k)=>d.getElementById(`s${si}q${i+1}b${k}`).value=a[0]));
+  d.getElementById('submitAll').click();
+  out.push(`제${si+1}회 ${d.getElementById('cur').textContent}점`);});
+console.log(out.join(' | '));
+console.log(d.getElementById('overview').querySelector('tfoot').textContent.replace(/\s+/g,' '));
+process.exit(0);

@@ -1,0 +1,22 @@
+const fs=require('fs'),cp=require('child_process'),os=require('os'),path=require('path');
+const html=fs.readFileSync(path.join(__dirname,'..','docs','index.html'),'utf8');
+const scripts=html.split('<script>').slice(1).map(s=>s.split('</script>')[0]);scripts.forEach(s=>new Function(s));
+const logic=scripts[1];const helpers=logic.slice(logic.indexOf('function norm'),logic.indexOf('const grade ='));
+const [EX,NO]=new Function(scripts[0]+';return [EXAMS,NOTES]')();
+console.log('sets',EX.length,'notes',NO.map(n=>n.length).join(','));
+const H=new Function(helpers+';return {matchBlank,gradeUnordered};')();
+const f=[];
+EX.forEach((E,si)=>E.questions.forEach((q,k)=>{
+  const id=(si+1)+'-'+(k+1);
+  q.ans.forEach(acc=>acc.forEach(a=>{if(!H.matchBlank(a,acc,q))f.push(id+':'+a)}));
+  const inp=q.ans.map(a=>' '+a[0]+' ');
+  const m=q.unordered?H.gradeUnordered([...inp].reverse(),q):inp.map((v,b)=>H.matchBlank(v,q.ans[b],q));
+  if(m.includes(false))f.push(id);
+  if(q.ans.some(a=>H.matchBlank('zzz',a,q)))f.push('junk '+id);
+}));
+console.log('self-grade failures',f);
+const s6=EX[5].questions.find(q=>q.set);console.log('set6 order-free',H.matchBlank('ㅅ,ㅁ,ㄷ,ㄱ',s6.ans[0],s6));
+let bad=0;EX.forEach((E,si)=>E.questions.forEach((q,k)=>{if(q.cat==='Python'){const tp=path.join(os.tmpdir(),'ipe_quiz_t.py');fs.writeFileSync(tp,q.code);const o=cp.execSync('python -I "'+tp+'"').toString().trim();if(o!==q.ans[0][0]){bad++;console.log('PY MISMATCH',si+1,k+1,o,q.ans[0][0])}}}));console.log('python mismatches',bad);
+let tb=0;[...EX.map(E=>E.questions.map(q=>q.q+q.exp)),...NO.map(n=>n.map(x=>x.body+x.trap+x.tip))].flat().forEach(h=>{for(const t of ['table','tr','pre','ul','div','b','code']){const o=(h.match(new RegExp('<'+t+'[ >]','g'))||[]).length,c=(h.match(new RegExp('</'+t+'>','g'))||[]).length;if(o!==c)tb++}});console.log('unbalanced tag blocks',tb);
+const cats={};EX.forEach(E=>E.questions.forEach(q=>cats[q.cat]=(cats[q.cat]||0)+1));console.log(JSON.stringify(cats));
+if(f.length||bad||tb||!H.matchBlank('ㅅ,ㅁ,ㄷ,ㄱ',s6.ans[0],s6)){console.log('FAILED');process.exit(1);}else console.log('content OK');

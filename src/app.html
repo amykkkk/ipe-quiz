@@ -1,0 +1,759 @@
+<style>
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 4px}
+.tab{padding:8px 13px;border-radius:10px;font-weight:700;font-size:15px}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .tab.active{color:#0d1220}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab.active{color:#0d1220}}
+.tab small{font-weight:500;margin-left:6px;opacity:.85}
+.tab.special{border-style:dashed}
+.tab .badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--bad);color:#fff;font-size:12px;line-height:20px}
+.pager{display:flex;justify-content:space-between;gap:8px;margin-top:4px}
+.view{display:none}
+.view.active{display:block}
+.overview{width:100%;border-collapse:collapse;font-size:14px}
+.overview th,.overview td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.filters select,.filters input{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
+.filters input[type=search]{flex:1;min-width:160px}
+.filters label{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.st{font-size:12px;padding:2px 8px;border-radius:999px;font-weight:700}
+.st.open{background:var(--bad-soft);color:var(--bad)}
+.st.done{background:var(--ok-soft);color:var(--ok)}
+.meta{font-size:13px;color:var(--muted)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.cmp div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--bg)}
+.cmp b{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.cmp .mine{border-color:var(--bad)} .cmp .right{border-color:var(--ok)}
+.study{margin-top:12px;border:1px solid var(--accent);border-radius:10px;background:var(--accent-soft);padding:12px 14px;font-size:15px}
+.study h4{margin:0 0 6px;font-size:15px;color:var(--accent)}
+.study .key{font-weight:800;margin-bottom:6px}
+.study table{border-collapse:collapse;margin:8px 0;font-size:13px;background:var(--card)}
+.study th,.study td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+.study th{background:var(--code-bg)}
+.study pre{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto;font-family:"D2Coding","Consolas",monospace;font-size:13px;white-space:pre}
+.study ul{margin:4px 0;padding-left:20px}
+.study .trap,.study .tip{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--card);font-size:14px}
+.study .trap{border-left:4px solid var(--warn)} .study .tip{border-left:4px solid var(--ok)}
+.kw{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.kw span{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);background:var(--card)}
+details.more{margin-top:10px}
+details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-size:14px}
+.weak{display:grid;gap:6px;margin-top:10px}
+.weak .row{display:grid;grid-template-columns:110px 1fr 60px;gap:8px;align-items:center;font-size:14px}
+.weak .row .meter i{background:var(--bad)}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.rbar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:14px;display:none}
+.rbar.show{display:block}
+.banner{border-color:var(--warn);background:var(--warn-soft)}
+.banner .actions{margin-top:8px}
+@media (max-width:560px){.cmp{grid-template-columns:1fr}.weak .row{grid-template-columns:80px 1fr 50px}}
+@media print{.bar,.rbar,.tabs,.filters,.actions,button,footer,#setFooter{display:none!important}.card{break-inside:avoid;border-color:#ccc}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">2026년 정기기사 제3회 대비 · 정보처리기사 실기(필답형)</div>
+    <h1>정보처리기사 실기 예상문제 모의고사 (제1회~제10회, 총 200문항)</h1>
+    <p>회차별 20문항 · 문항당 5점 · 100점 만점 · 60점 이상 합격 · 답안·점수·남은 시간은 자동 저장되며, 틀린 문제는 자동으로 <b>오답노트</b>에 모이고 <b>오답 재시험</b>으로 다시 풀 수 있습니다.</p>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="card banner" id="storageWarn" style="display:none;margin:10px 0 0">⚠️ <b>이 브라우저에서는 기록이 저장되지 않습니다.</b> 시크릿 창이거나 브라우저 설정에서 사이트 데이터 저장이 차단된 것 같습니다. 지금 풀이는 가능하지만 새로고침하거나 창을 닫으면 답안·점수·오답노트가 사라집니다.</div>
+    <div class="card banner" id="syncWarn" style="display:none;margin:10px 0 0">🔄 다른 탭(창)에서 이 모의고사 기록이 변경되었습니다.<div class="actions"><button class="primary" id="syncLoad">최신 기록 불러오기</button><button id="syncIgnore">이 탭 기록 유지</button></div></div>
+  </header>
+
+  <div class="bar" id="setBar">
+    <div class="bar-inner">
+      <div class="stats">
+        <span><b id="setName">제1회</b></span>
+        <span>제출 <b id="done">0</b>/20</span>
+        <span>현재 점수 <b id="cur">0</b>점</span>
+        <span>남은 시간 <b id="timer">2:30:00</b></span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="themeBtn" title="테마 전환">🌓</button>
+        <button id="submitAll" class="primary">전체 제출·채점</button>
+      </div>
+    </div>
+    <div class="nav" id="nav"></div>
+  </div>
+
+  <div id="sets"></div>
+
+  <!-- 오답 재시험 -->
+  <section class="view" id="view-retest">
+    <div class="rbar" id="rbar">
+      <div class="bar-inner">
+        <div class="stats"><span><b>오답 재시험</b></span><span>제출 <b id="rDone">0</b>/<b id="rTotal">0</b></span><span>정답 <b id="rOk">0</b></span></div>
+        <div style="display:flex;gap:6px"><button class="themeBtn" title="테마 전환">🌓</button><button id="rSubmitAll" class="primary">전체 제출·채점</button></div>
+      </div>
+    </div>
+    <div class="card" id="rSetup">
+      <div class="qhead"><span class="qnum">🔁 오답 재시험</span></div>
+      <p class="qtext" id="rInfo"></p>
+      <div class="filters">
+        <label>범위 <select id="rScope"><option value="open">미해결 오답만</option><option value="all">오답노트 전체(극복 포함)</option></select></label>
+        <label>영역 <select id="rCat"></select></label>
+        <label><input type="checkbox" id="rShuffle" checked> 문제 순서 섞기</label>
+      </div>
+      <div class="actions"><button class="primary" id="rStart">재시험 시작</button></div>
+      <p class="note" style="margin:10px 0 0">재시험에서 맞히면 <b>극복</b>으로 표시되고, 다음 재시험의 '미해결 오답'에서 빠집니다. 또 틀리면 틀린 횟수가 늘어납니다.</p>
+    </div>
+    <section class="card" id="rFinal" style="display:none"></section>
+    <main id="rList"></main>
+  </section>
+
+  <!-- 오답노트 -->
+  <section class="view" id="view-note">
+    <div class="card">
+      <div class="qhead"><span class="qnum">📒 오답노트</span><span class="pts" id="nCount"></span></div>
+      <p class="note" style="margin:0">틀린 문제가 자동으로 저장됩니다(이 브라우저에 보관되어 새로고침·재실행 후에도 유지). 문제마다 <b>내 답 / 정답 / 해설</b>과 함께 <b>핵심 개념·관련 이론·함정 포인트·암기 팁</b>을 정리했습니다.</p>
+      <div id="weak"></div>
+      <div class="filters">
+        <label>상태 <select id="nStatus"><option value="all">전체</option><option value="open">미해결</option><option value="done">극복</option></select></label>
+        <label>영역 <select id="nCat"></select></label>
+        <label>회차 <select id="nSet"></select></label>
+        <label>정렬 <select id="nSort"><option value="set">회차·번호순</option><option value="cnt">많이 틀린 순</option><option value="cat">영역별</option></select></label>
+        <input type="search" id="nSearch" placeholder="키워드 검색 (예: 정규화, 포인터)">
+      </div>
+      <div class="actions">
+        <button class="primary" id="nRetest">보이는 오답으로 재시험</button>
+        <button id="nPrint">인쇄 / PDF 저장</button>
+        <button id="nClear">오답노트 비우기</button>
+      </div>
+    </div>
+    <main id="nList"></main>
+  </section>
+
+  <div class="card" id="setFooter">
+    <div class="actions" style="margin-top:0">
+      <button id="submitAll2" class="primary">전체 제출·채점</button>
+      <button id="resetBtn">이 회차 다시 풀기</button>
+      <button id="resetAllBtn">전체 회차 기록 초기화</button>
+    </div>
+    <div class="pager" style="margin-top:12px">
+      <button id="prevBtn">◀ 이전 회차</button>
+      <button id="nextBtn">다음 회차 ▶</button>
+    </div>
+    <p class="note" style="margin:12px 0 0">※ 회차마다 답안(입력 중인 답 포함)·채점 결과·남은 시간이 <b>이 브라우저에 자동 저장</b>되어, 새로고침하거나 나중에 다시 열어도 이어서 풀 수 있습니다(보고 있는 회차만 타이머가 흐름). 기록을 지우려면 [이 회차 다시 풀기] 또는 [전체 회차 기록 초기화]를 누르세요. 틀리거나 부분 정답인 문제는 <b>오답노트</b>에 자동 저장됩니다. 자동 채점은 띄어쓰기·대소문자(용어 문항)를 무시하고 괄호 안팎 표기도 인정합니다. 의미상 맞는데 오답 처리되면 <b>[내 답 정답 인정]</b>을 누르세요(오답노트에서도 빠집니다). 코드 실행 결과 문항은 대소문자와 값 사이 띄어쓰기를 구분합니다. 빈칸이 여러 개인 문항에서 <b>Enter</b>는 다음 칸으로 이동하고, 마지막 칸에서 누르면 제출됩니다.</p>
+  </div>
+
+  <section class="card" id="overviewCard">
+    <div class="note">전체 회차 성적표</div>
+    <div class="tblwrap"><table class="overview" id="overview"></table></div>
+  </section>
+  <footer>본 문제는 최근 5년(2021~2026년 2회) 출제 경향을 분석해 만든 예상 문제이며 실제 시험 문제가 아닙니다.</footer>
+</div>
+
+<script>
+const EXAMS = [];
+const NOTES = [];
+/*__DATA__*/
+</script>
+<script>
+(function(){
+  const PTS = 5;
+  const LS_KEY = 'jpk2026_3_wrongnote_v1';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const $ = id => document.getElementById(id);
+
+  /* ---------- grading ---------- */
+  function norm(s, q){
+    s = String(s).normalize('NFC');
+    // code output: keep value boundaries (collapse spaces), but ignore spaces next to , [ ] ( ) { } : ; |
+    if (q.cs) s = s.replace(/[\s ]+/g,' ').trim().replace(/ ?([,\[\](){}:;|]) ?/g,'$1');
+    else s = s.replace(/[\s ]+/g,'');
+    if (q.seq) s = s.replace(/[,，、\-–>→·]/g,'');
+    if (!q.cs) s = s.toLowerCase().replace(/[‘’“”'"`]/g,'');
+    if (q.set) s = [...s].sort().join('');
+    return s;
+  }
+  // 'A(B)' style input: accept when the whole text matches, or when every non-empty part (outside and inside) is itself an accepted answer
+  function matchBlank(input, accepted, q){
+    const acc = accepted.map(a => norm(a,q));
+    const hit = t => { const n = norm(t,q); return n !== '' && acc.includes(n); };
+    if (hit(input)) return true;
+    if (q.cs) return false;
+    if (hit(String(input).replace(/[()（）]/g,''))) return true;
+    const m = String(input).match(/^(.*?)[(（](.*?)[)）]\s*$/);
+    if (!m) return false;
+    const parts = [m[1], m[2]].filter(t => norm(t,q) !== '');
+    return parts.length > 0 && parts.every(hit);
+  }
+  function gradeUnordered(inputs, q){
+    const used = new Array(q.ans.length).fill(false);
+    return inputs.map(v => {
+      for (let j=0;j<q.ans.length;j++){ if (!used[j] && matchBlank(v, q.ans[j], q)){ used[j]=true; return true; } }
+      return false;
+    });
+  }
+  const grade = (q, vals) => q.unordered ? gradeUnordered(vals, q) : vals.map((v,k) => matchBlank(v, q.ans[k], q));
+  const scoreOf = (marks, override) => override ? PTS : Math.round(PTS * marks.filter(Boolean).length / marks.length * 10) / 10;
+  const labelsOf = q => q.blanks || (q.ans.length === 1 ? ['답'] : q.ans.map((_,k)=>'①②③④⑤⑥'[k]));
+
+  /* ---------- wrong-note storage ---------- */
+  let WR = {};
+  try { WR = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {}; } catch(e) { WR = {}; }
+  const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(WR)); } catch(e) {} };
+  const keyOf = (si, i) => si + '-' + i;
+  const Qof = k => { const [si,i] = k.split('-').map(Number); return {si, i, q: EXAMS[si] && EXAMS[si].questions[i]}; };
+  Object.keys(WR).forEach(k => { if (!Qof(k).q) delete WR[k]; });
+
+  function recordWrong(si, i, vals){
+    const k = keyOf(si,i), w = WR[k] || {cnt:0};
+    WR[k] = {cnt: w.cnt + 1, mastered:false, last: vals, ts: Date.now()};
+    save(); refreshBadges();
+  }
+  function recordRight(si, i){
+    const k = keyOf(si,i);
+    if (WR[k]){ WR[k].mastered = true; WR[k].ts = Date.now(); save(); refreshBadges(); }
+  }
+  function undoWrong(si, i){
+    const k = keyOf(si,i);
+    if (!WR[k]) return;
+    WR[k].cnt--; if (WR[k].cnt <= 0) delete WR[k]; else WR[k].mastered = true;
+    save(); refreshBadges();
+  }
+
+  /* ---------- shared card UI ---------- */
+  function studyHtml(si, i){
+    const n = NOTES[si] && NOTES[si][i];
+    if (!n) return '';
+    return `<div class="study"><h4>📘 자세한 관련 정보</h4>
+      <div class="key">핵심 개념 · ${esc(n.key)}</div>
+      <div>${n.body}</div>
+      <div class="trap">⚠️ <b>함정 포인트</b> ${n.trap}</div>
+      <div class="tip">💡 <b>암기 팁</b> ${n.tip}</div>
+      <div class="kw">${(n.kw||[]).map(x=>`<span>#${esc(x)}</span>`).join('')}</div></div>`;
+  }
+  function ansHtml(q){
+    const labels = q.ans.length === 1 && !q.blanks ? null : labelsOf(q);
+    return q.ans.map((a,k) => (labels ? `<b>${esc(labels[k])}</b> ` : '') + `<code>${esc(a[0])}</code>` + (a.length>1 ? ` <span class="note">(인정: ${a.slice(1).map(esc).join(', ')})</span>` : '')).join('<br>');
+  }
+  function questionHtml(q, idp, n, head){
+    return `<div class="qhead"><span class="qnum">${n}.</span><span class="chip">${esc(q.cat)}</span>${head||''}<span class="pts">[${PTS}점]</span></div>
+      <div class="qtext">${q.q}</div>
+      ${q.code ? `<pre class="code"><code></code></pre>` : ''}`;
+  }
+  function fillCode(card, q){ const c = card.querySelector('pre.code code'); if (c) c.textContent = q.code.replace(/^\n/,'').replace(/\s+$/,''); }
+
+  // builds an answerable card; onSubmit(vals, marks) returns nothing
+  function makeCard(idp, q, n, head, onSubmit){
+    const card = document.createElement('article');
+    card.className = 'card'; card.id = idp;
+    card.innerHTML = questionHtml(q, idp, n, head) +
+      `<div class="blanks">${labelsOf(q).map((l,k)=>`<div class="blank"><label for="${idp}b${k}">${esc(l)}</label><input id="${idp}b${k}" autocomplete="off" spellcheck="false" placeholder="답을 입력하세요"></div>`).join('')}</div>
+       <div class="actions"><button class="primary sub">답안 제출</button></div>
+       <div class="result"></div>`;
+    fillCode(card, q);
+    const go = () => {
+      if (card.dataset.submitted) return;
+      const inputs = [...card.querySelectorAll('.blank input')];
+      const vals = inputs.map(x => x.value);
+      const marks = grade(q, vals);
+      card.dataset.submitted = '1';
+      inputs.forEach((inp,k) => { inp.disabled = true; inp.classList.add(marks[k] ? 'ok' : 'bad'); });
+      card.querySelector('.sub').disabled = true;
+      onSubmit(vals, marks);
+    };
+    card.querySelector('.sub').addEventListener('click', go);
+    const ins = [...card.querySelectorAll('.blank input')];
+    ins.forEach((inp, k) => inp.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' || e.isComposing) return;
+      e.preventDefault();
+      if (k < ins.length - 1) ins[k+1].focus(); else go();   // Enter = next blank, last blank = submit
+    }));
+    card.submit = go;
+    return card;
+  }
+  function resetCard(card){
+    delete card.dataset.submitted;
+    card.querySelectorAll('.blank input').forEach(inp => { inp.value=''; inp.disabled=false; inp.classList.remove('ok','bad'); });
+    card.querySelector('.sub').disabled = false;
+    const r = card.querySelector('.result'); r.className='result'; r.innerHTML='';
+  }
+  function showResult(card, q, si, i, marks, override, onOverride, extra){
+    const box = card.querySelector('.result');
+    const sc = scoreOf(marks, override);
+    const kind = sc === PTS ? 'ok' : (sc > 0 ? 'part' : 'bad');
+    const verdict = override ? '⭕ 정답 인정 (수동 채점)' : kind === 'ok' ? '⭕ 정답' : kind === 'part' ? '△ 부분 정답' : '❌ 오답';
+    box.className = 'result show ' + kind;
+    box.innerHTML = `<div class="verdict">${verdict} · ${sc}점 / ${PTS}점 ${extra||''}</div>
+      <div class="ans">정답${q.unordered ? ' (순서 무관)' : ''}:<br>${ansHtml(q)}</div>
+      <div class="exp"><b>해설</b><br>${q.exp}</div>
+      ${NOTES[si] && NOTES[si][i] ? `<details class="more"${kind !== 'ok' ? ' open' : ''}><summary>📘 자세한 관련 정보 ${kind !== 'ok' ? '' : '보기'}</summary>${studyHtml(si,i)}</details>` : ''}
+      ${kind !== 'ok' && !override && onOverride ? '<button class="override">내 답 정답 인정</button>' : ''}`;
+    const ob = box.querySelector('.override');
+    if (ob) ob.addEventListener('click', onOverride);
+    return kind;
+  }
+
+  /* ---------- exam sets ---------- */
+  const freshSt = E => E.questions.map(q => ({submitted:false, marks:q.ans.map(()=>false), override:false, vals:q.ans.map(()=>'')}));
+  const S = EXAMS.map(E => ({ E, remain: 150*60, finished:false, st: freshSt(E) }));
+
+  /* ---------- progress storage (answers, scores, timers) ---------- */
+  const PK = 'jpk2026_3_progress_v1';
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(PK) || 'null'); } catch(e) { saved = null; }
+  function saveProgress(){
+    if (syncPending) return;   // another tab changed the record and this tab hasn't decided yet: don't overwrite
+    try {
+      localStorage.setItem(PK, JSON.stringify(S.map(x => ({ remain: x.remain,
+        st: x.st.map(s => ({submitted:s.submitted, override:s.override, vals:s.vals})) }))));
+    } catch(e) {}
+  }
+  let syncPending = false;
+  let saveTid = null;
+  const saveSoon = () => { clearTimeout(saveTid); saveTid = setTimeout(saveProgress, 400); };
+  let view = 0; // 0..4 = sets, 'retest', 'note'
+  const isSet = () => typeof view === 'number';
+  const qScore = (si,i) => { const s = S[si].st[i]; return s.submitted ? scoreOf(s.marks, s.override) : 0; };
+  const total = si => Math.round(S[si].E.questions.reduce((t,_,i)=>t+qScore(si,i),0)*10)/10;
+  const doneCnt = si => S[si].st.filter(s=>s.submitted).length;
+
+  const tabs = $('tabs'), setsBox = $('sets'), nav = $('nav');
+  S.forEach((set, si) => {
+    const t = document.createElement('button');
+    t.className = 'tab'; t.id = 'tab'+si;
+    t.addEventListener('click', () => show(si, true));
+    tabs.appendChild(t);
+    const box = document.createElement('section');
+    box.className = 'view'; box.id = 'set'+si;
+    box.innerHTML = `<section class="card banner" id="timeup${si}" style="display:none"><b>⏰ 제${si+1}회 시험 시간(2시간 30분)이 끝났습니다.</b><br><span class="note">실제 시험이라면 여기서 답안지를 제출합니다.</span><div class="actions"><button class="primary tuSubmit">입력한 답으로 지금 제출·채점</button><button class="tuKeep">시간 초과로 계속 풀기</button></div></section><section class="card" id="final${si}" style="display:none"></section><main></main>`;
+    box.querySelector('.tuSubmit').addEventListener('click', () => { box.querySelector('#timeup'+si).style.display='none'; set.E.questions.forEach((_,i) => $(`s${si}q${i+1}`).submit()); });
+    box.querySelector('.tuKeep').addEventListener('click', () => { set.tuDismissed = true; box.querySelector('#timeup'+si).style.display='none'; });
+    setsBox.appendChild(box);
+    const main = box.querySelector('main');
+    set.E.questions.forEach((q, i) => {
+      const card = makeCard(`s${si}q${i+1}`, q, i+1, '', (vals, marks) => {
+        const s = set.st[i];
+        s.submitted = true; s.marks = marks; s.vals = vals;
+        const full = scoreOf(marks,false) === PTS;
+        if (full) recordRight(si, i); else recordWrong(si, i, vals);
+        renderSetResult(si, i);
+        updateSet();
+        saveProgress();
+      });
+      card.querySelectorAll('.blank input').forEach((inp, k) => inp.addEventListener('input', () => { set.st[i].vals[k] = inp.value; saveSoon(); }));
+      main.appendChild(card);
+    });
+  });
+  [['retest','🔁 오답 재시험'],['note','📒 오답노트']].forEach(([v, label]) => {
+    const t = document.createElement('button');
+    t.className = 'tab special'; t.id = 'tab-'+v;
+    t.innerHTML = label + `<span class="badge" id="badge-${v}" style="display:none"></span>`;
+    t.addEventListener('click', () => show(v, true));
+    tabs.appendChild(t);
+  });
+
+  function renderSetResult(si, i){
+    const s = S[si].st[i], q = S[si].E.questions[i];
+    const card = $(`s${si}q${i+1}`);
+    const inNote = !!WR[keyOf(si,i)] && !s.override && scoreOf(s.marks,false) < PTS;
+    const kind = showResult(card, q, si, i, s.marks, s.override, () => {
+      s.override = true; undoWrong(si, i); renderSetResult(si, i); updateSet(); saveProgress();
+    }, inNote ? '<span class="note">· 📒 오답노트에 저장됨</span>' : '');
+    if (si === view){ const nv = $('nav'+(i+1)); if (nv) nv.className = kind; }
+  }
+
+  function buildNav(){
+    nav.innerHTML = '';
+    S[view].E.questions.forEach((_, i) => {
+      const a = document.createElement('a');
+      a.href = `#s${view}q${i+1}`; a.textContent = i+1; a.id = 'nav'+(i+1);
+      if (S[view].st[i].submitted){ const sc = qScore(view,i); a.className = sc === PTS ? 'ok' : sc > 0 ? 'part' : 'bad'; }
+      nav.appendChild(a);
+    });
+  }
+
+  function show(v, scroll){
+    view = v;
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    if (isSet()){
+      $('set'+v).classList.add('active'); $('tab'+v).classList.add('active');
+      $('prevBtn').disabled = v === 0; $('nextBtn').disabled = v === S.length - 1;
+      buildNav(); updateSet(); renderTimer(); checkTimeUp();
+    } else {
+      $('view-'+v).classList.add('active'); $('tab-'+v).classList.add('active');
+      if (v === 'note') renderNote(); else renderRetestSetup();
+    }
+    $('setBar').style.display = isSet() ? '' : 'none';
+    $('setFooter').style.display = isSet() ? '' : 'none';
+    $('overviewCard').style.display = v === 'note' ? 'none' : '';
+    try { history.replaceState(null, '', '#' + (isSet() ? 'set' + (v+1) : v)); } catch(e) {}
+    if (scroll) window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function updateSet(){
+    S.forEach((_, k) => {
+      const d = doneCnt(k), n = S[k].E.questions.length;
+      $('tab'+k).innerHTML = `제${k+1}회<small>${d === n ? total(k)+'점' : d ? d+'/'+n : ''}</small>`;
+    });
+    renderOverview();
+    if (!isSet()) return;
+    const si = view;
+    $('setName').textContent = `제${si+1}회`;
+    $('done').textContent = doneCnt(si);
+    $('cur').textContent = total(si);
+    if (doneCnt(si) === S[si].E.questions.length) showFinal(si);
+  }
+
+  function catTable(rows){
+    return `<table class="cat-table"><thead><tr><th>영역</th><th>문항</th><th class="n">득점</th><th style="width:35%"></th></tr></thead><tbody>
+      ${Object.entries(rows).map(([c,v])=>`<tr><td>${esc(c)}</td><td>${v.cnt}</td><td class="n">${Math.round(v.got*10)/10}/${v.max}</td><td><div class="meter"><i style="width:${v.got/v.max*100}%"></i></div></td></tr>`).join('')}
+      </tbody></table>`;
+  }
+
+  function showFinal(si){
+    const Q = S[si].E.questions, f = $('final'+si);
+    const tot = total(si), pass = tot >= 60;
+    const cats = {};
+    Q.forEach((q,i) => { const c = q.cat; cats[c] = cats[c] || {got:0,max:0,cnt:0}; cats[c].got += qScore(si,i); cats[c].max += PTS; cats[c].cnt++; });
+    const wrong = Q.map((q,i)=>({i,sc:qScore(si,i)})).filter(x=>x.sc<PTS);
+    const firstTime = !S[si].finished;
+    S[si].finished = true;
+    f.style.display = 'block';
+    f.innerHTML = `<div class="note">제${si+1}회 최종 채점 결과</div>
+      <div class="score-big ${pass?'pass':'fail'}">${tot}점 <span style="font-size:22px">${pass?'합격 🎉':'불합격'}</span></div>
+      <p class="note" style="margin:4px 0 0">정답 ${Q.filter((_,i)=>qScore(si,i)===PTS).length}문항 · 부분 정답 ${Q.filter((_,i)=>qScore(si,i)>0&&qScore(si,i)<PTS).length}문항 · 오답 ${Q.filter((_,i)=>qScore(si,i)===0).length}문항 (합격 기준 60점)</p>
+      ${catTable(cats)}
+      ${wrong.length ? `<p style="margin:12px 0 0;font-size:14px"><b>복습할 문항:</b> ${wrong.map(w=>`<a href="#s${si}q${w.i+1}">${w.i+1}번(${esc(Q[w.i].cat)})</a>`).join(', ')}</p>` : '<p><b>만점입니다!</b></p>'}
+      <div class="actions">
+        ${wrong.length ? `<button class="primary goRetest">이 회차 오답 ${wrong.length}문항 재시험 🔁</button><button class="goNote">오답노트 보기 📒</button>` : ''}
+        ${si < S.length-1 ? `<button class="goNext">제${si+2}회 풀러 가기 ▶</button>` : ''}
+      </div>`;
+    const b = sel => f.querySelector(sel);
+    if (b('.goNext')) b('.goNext').addEventListener('click', () => show(si+1, true));
+    if (b('.goNote')) b('.goNote').addEventListener('click', () => { $('nSet').value = String(si); $('nStatus').value = 'open'; show('note', true); });
+    if (b('.goRetest')) b('.goRetest').addEventListener('click', () => { show('retest', false); startRetest(wrong.map(w => keyOf(si, w.i))); });
+    if (firstTime && si === view) f.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function renderOverview(){
+    const rows = S.map((s,k) => {
+      const d = doneCnt(k), n = s.E.questions.length, t = total(k);
+      const status = d === n ? (t >= 60 ? '<span class="pass">합격</span>' : '<span class="fail">불합격</span>') : d ? '진행 중' : '미응시';
+      return `<tr><td><a href="#set${k+1}" data-set="${k}">제${k+1}회</a></td><td>${d}/${n}</td><td>${d ? t+'점' : '-'}</td><td>${status}</td></tr>`;
+    }).join('');
+    const fin = S.map((_,k)=>k).filter(k=>doneCnt(k)===S[k].E.questions.length);
+    const avg = fin.length ? Math.round(fin.reduce((a,k)=>a+total(k),0)/fin.length*10)/10 : null;
+    const ov = $('overview');
+    ov.innerHTML = `<thead><tr><th>회차</th><th>제출</th><th>점수</th><th>결과</th></tr></thead><tbody>${rows}</tbody>` +
+      (avg !== null ? `<tfoot><tr><td><b>완료 회차 평균</b></td><td>${fin.length}회</td><td><b>${avg}점</b></td><td></td></tr></tfoot>` : '');
+    ov.querySelectorAll('a[data-set]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); show(+a.dataset.set, true); }));
+  }
+
+  function submitAll(){
+    const left = S[view].st.filter(s=>!s.submitted).length;
+    if (left && !window.confirm(`제${view+1}회에 아직 제출하지 않은 ${left}문항이 있습니다. 입력한 답으로 모두 제출하고 채점할까요?`)) return;
+    S[view].E.questions.forEach((_,i) => $(`s${view}q${i+1}`).submit());
+  }
+  $('submitAll').addEventListener('click', submitAll);
+  $('submitAll2').addEventListener('click', submitAll);
+  $('prevBtn').addEventListener('click', () => view > 0 && show(view-1, true));
+  $('nextBtn').addEventListener('click', () => view < S.length-1 && show(view+1, true));
+  $('resetBtn').addEventListener('click', () => {
+    if (!window.confirm(`제${view+1}회의 답안을 모두 지우고 다시 풀까요? (오답노트는 유지됩니다)`)) return;
+    const set = S[view];
+    set.remain = 150*60; set.finished = false; set.tuDismissed = false;
+    set.st = freshSt(set.E);
+    $('timeup'+view).style.display = 'none';
+    $('set'+view).querySelectorAll('article.card').forEach(resetCard);
+    const f = $('final'+view); f.style.display='none'; f.innerHTML='';
+    buildNav(); updateSet(); renderTimer(); saveProgress();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+  $('resetAllBtn').addEventListener('click', () => {
+    if (!window.confirm('제1회~제' + S.length + '회의 답안·점수·남은 시간을 모두 지울까요? (오답노트는 유지됩니다)')) return;
+    applyProgress(null);
+    saveProgress(); show(0, true);
+  });
+
+  /* ---------- retest ---------- */
+  let R = null; // {keys, res:{key:{marks,override}}}
+  const catsAll = [...new Set(EXAMS.flatMap(E => E.questions.map(q => q.cat)))];
+  $('nSet').innerHTML = '<option value="all">전체</option>' + EXAMS.map((_,k)=>`<option value="${k}">제${k+1}회</option>`).join('');
+  [$('rCat'), $('nCat')].forEach(s => { s.innerHTML = '<option value="all">전체</option>' + catsAll.map(c=>`<option>${esc(c)}</option>`).join(''); });
+
+  function poolKeys(scope, cat){
+    return Object.keys(WR).filter(k => (scope === 'all' || !WR[k].mastered) && (cat === 'all' || Qof(k).q.cat === cat))
+      .sort((a,b) => { const A=Qof(a), B=Qof(b); return A.si-B.si || A.i-B.i; });
+  }
+  function renderRetestSetup(){
+    const open = Object.values(WR).filter(w=>!w.mastered).length, all = Object.keys(WR).length;
+    const n = poolKeys($('rScope').value, $('rCat').value).length;
+    $('rInfo').innerHTML = all
+      ? `오답노트에 <b>${all}문항</b>이 있고, 그중 미해결 오답은 <b>${open}문항</b>입니다. 현재 조건으로 <b>${n}문항</b>을 다시 풉니다.`
+      : '아직 틀린 문제가 없습니다. 회차별 모의고사를 먼저 풀어 보세요. 틀린 문제가 자동으로 모입니다.';
+    $('rStart').disabled = n === 0;
+  }
+  ['rScope','rCat'].forEach(id => $(id).addEventListener('change', renderRetestSetup));
+  $('rStart').addEventListener('click', () => {
+    let keys = poolKeys($('rScope').value, $('rCat').value);
+    if ($('rShuffle').checked) keys = keys.map(k=>[Math.random(),k]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+    startRetest(keys);
+  });
+
+  function startRetest(keys){
+    if (!keys.length) return false;
+    if (R && Object.keys(R.res).length < R.keys.length &&
+        !window.confirm(`진행 중인 오답 재시험(${Object.keys(R.res).length}/${R.keys.length} 제출)이 있습니다. 종료하고 새 재시험을 시작할까요?`)) { show('retest', false); return false; }
+    R = {keys, res:{}};
+    const list = $('rList'); list.innerHTML = '';
+    $('rFinal').style.display = 'none';
+    $('rSetup').style.display = 'none';
+    $('rbar').classList.add('show');
+    keys.forEach((k, idx) => {
+      const {si, i, q} = Qof(k);
+      const w = WR[k];
+      const head = `<span class="meta">제${si+1}회 ${i+1}번${w ? ` · 틀린 횟수 ${w.cnt}` : ''}</span>`;
+      const card = makeCard('r'+idx, q, idx+1, head, (vals, marks) => {
+        R.res[k] = {marks, override:false};
+        if (scoreOf(marks,false) === PTS) recordRight(si, i); else recordWrong(si, i, vals);
+        renderR(idx, k);
+        updateRetest();
+      });
+      list.appendChild(card);
+    });
+    updateRetest();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function renderR(idx, k){
+    const {si, i, q} = Qof(k), r = R.res[k];
+    showResult($('r'+idx), q, si, i, r.marks, r.override, () => {
+        r.override = true;
+        if (WR[k]){ WR[k].cnt = Math.max(1, WR[k].cnt - 1); WR[k].mastered = true; WR[k].ts = Date.now(); save(); refreshBadges(); }
+        renderR(idx, k); updateRetest();
+      },
+      scoreOf(r.marks, r.override) === PTS ? '<span class="note">· ✅ 극복 처리됨</span>' : '<span class="note">· 틀린 횟수 ' + (WR[k] ? WR[k].cnt : '') + '회</span>');
+  }
+  function updateRetest(){
+    if (!R) return;
+    const done = Object.keys(R.res).length, ok = Object.values(R.res).filter(r => scoreOf(r.marks, r.override) === PTS).length;
+    $('rDone').textContent = done; $('rTotal').textContent = R.keys.length; $('rOk').textContent = ok;
+    if (done === R.keys.length) finishRetest();
+  }
+  function finishRetest(){
+    const n = R.keys.length;
+    const got = R.keys.reduce((t,k)=>t+scoreOf(R.res[k].marks, R.res[k].override),0);
+    const ok = R.keys.filter(k => scoreOf(R.res[k].marks, R.res[k].override) === PTS).length;
+    const pct = Math.round(got / (n*PTS) * 1000) / 10;
+    const cats = {};
+    R.keys.forEach(k => { const {q} = Qof(k), c = q.cat; cats[c] = cats[c] || {got:0,max:0,cnt:0}; cats[c].got += scoreOf(R.res[k].marks, R.res[k].override); cats[c].max += PTS; cats[c].cnt++; });
+    const still = Object.values(WR).filter(w=>!w.mastered).length;
+    const f = $('rFinal');
+    f.style.display = 'block';
+    f.innerHTML = `<div class="note">오답 재시험 결과</div>
+      <div class="score-big ${pct>=60?'pass':'fail'}">${ok}/${n} <span style="font-size:22px">문항 정답 · 100점 환산 ${pct}점</span></div>
+      <p class="note" style="margin:4px 0 0">이번에 맞힌 ${ok}문항은 <b>극복</b> 처리되었습니다. 남은 미해결 오답: <b>${still}문항</b></p>
+      ${catTable(cats)}
+      <div class="actions">
+        ${still ? `<button class="primary again">남은 오답 ${still}문항 다시 재시험</button>` : '<span class="pass" style="font-weight:700">🎉 미해결 오답을 모두 극복했습니다!</span>'}
+        <button class="toNote">오답노트에서 복습하기 📒</button>
+        <button class="toSetup">재시험 설정으로</button>
+      </div>`;
+    const again = f.querySelector('.again');
+    if (again) again.addEventListener('click', () => { $('rScope').value='open'; $('rCat').value='all'; let keys = poolKeys('open','all'); if ($('rShuffle').checked) keys = keys.map(k=>[Math.random(),k]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); startRetest(keys); });
+    f.querySelector('.toNote').addEventListener('click', () => show('note', true));
+    f.querySelector('.toSetup').addEventListener('click', endRetest);
+    f.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function endRetest(){
+    R = null; $('rList').innerHTML = ''; $('rFinal').style.display='none';
+    $('rSetup').style.display = ''; $('rbar').classList.remove('show');
+    renderRetestSetup(); window.scrollTo({top:0, behavior:'smooth'});
+  }
+  $('rSubmitAll').addEventListener('click', () => {
+    if (!R) return;
+    const left = R.keys.length - Object.keys(R.res).length;
+    if (left && !window.confirm(`아직 제출하지 않은 ${left}문항이 있습니다. 모두 제출하고 채점할까요?`)) return;
+    R.keys.forEach((_, idx) => $('r'+idx).submit());
+  });
+
+  /* ---------- wrong note ---------- */
+  function noteKeys(){
+    const st = $('nStatus').value, cat = $('nCat').value, set = $('nSet').value, kw = $('nSearch').value.trim().toLowerCase(), sort = $('nSort').value;
+    const strip = h => String(h).replace(/<[^>]+>/g,' ');
+    let keys = Object.keys(WR).filter(k => {
+      const {si, i, q} = Qof(k), w = WR[k];
+      if (st === 'open' && w.mastered) return false;
+      if (st === 'done' && !w.mastered) return false;
+      if (cat !== 'all' && q.cat !== cat) return false;
+      if (set !== 'all' && String(si) !== set) return false;
+      if (kw){
+        const n = NOTES[si] && NOTES[si][i];
+        const hay = [q.cat, strip(q.q), q.code||'', strip(q.exp), q.ans.flat().join(' '), n ? [n.key, strip(n.body), strip(n.trap), strip(n.tip), (n.kw||[]).join(' ')].join(' ') : ''].join(' ').toLowerCase();
+        if (!hay.includes(kw)) return false;
+      }
+      return true;
+    });
+    const bySet = (a,b) => { const A=Qof(a), B=Qof(b); return A.si-B.si || A.i-B.i; };
+    if (sort === 'cnt') keys.sort((a,b) => WR[b].cnt - WR[a].cnt || bySet(a,b));
+    else if (sort === 'cat') keys.sort((a,b) => catsAll.indexOf(Qof(a).q.cat) - catsAll.indexOf(Qof(b).q.cat) || bySet(a,b));
+    else keys.sort(bySet);
+    return keys;
+  }
+  function renderNote(){
+    const all = Object.keys(WR), open = all.filter(k=>!WR[k].mastered).length;
+    $('nCount').textContent = `총 ${all.length}문항 · 미해결 ${open} · 극복 ${all.length-open}`;
+    // weak areas
+    const byCat = {};
+    all.forEach(k => { const c = Qof(k).q.cat; byCat[c] = byCat[c] || {open:0, all:0}; byCat[c].all++; if (!WR[k].mastered) byCat[c].open++; });
+    const maxN = Math.max(1, ...Object.values(byCat).map(v=>v.all));
+    $('weak').innerHTML = all.length ? `<p style="margin:12px 0 0;font-size:14px"><b>취약 영역</b> <span class="note">(막대: 미해결 오답 수 / 숫자: 미해결·전체)</span></p><div class="weak">` +
+      Object.entries(byCat).sort((a,b)=>b[1].open-a[1].open || b[1].all-a[1].all).map(([c,v]) =>
+        `<div class="row"><span>${esc(c)}</span><div class="meter"><i style="width:${v.open/maxN*100}%"></i></div><span class="note">${v.open}/${v.all}</span></div>`).join('') + '</div>' : '';
+    const keys = noteKeys();
+    const list = $('nList');
+    $('nRetest').disabled = keys.length === 0;
+    if (!all.length){ list.innerHTML = '<div class="card empty">📭 아직 오답이 없습니다.<br>회차별 모의고사를 풀면 틀린 문제와 관련 학습 자료가 여기에 자동으로 정리됩니다.</div>'; return; }
+    if (!keys.length){ list.innerHTML = '<div class="card empty">조건에 맞는 오답이 없습니다.</div>'; return; }
+    list.innerHTML = '';
+    keys.forEach((k, idx) => {
+      const {si, i, q} = Qof(k), w = WR[k];
+      const labels = labelsOf(q);
+      const mine = (w.last || []).map((v,j) => (labels.length>1 ? `<b style="display:inline;color:inherit">${esc(labels[j])}</b> ` : '') + (String(v).trim() ? esc(v) : '<span class="note">(미입력)</span>')).join('<br>');
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = questionHtml(q, 'n'+idx, idx+1,
+          `<span class="meta">제${si+1}회 ${i+1}번 · 틀린 횟수 ${w.cnt}회</span><span class="st ${w.mastered?'done':'open'}">${w.mastered?'극복':'미해결'}</span>`) +
+        `<div class="cmp"><div class="mine"><b>마지막에 쓴 내 답</b>${mine || '<span class="note">(기록 없음)</span>'}</div><div class="right"><b>정답${q.unordered ? ' (순서 무관)' : ''}</b>${ansHtml(q)}</div></div>
+         <div class="exp" style="font-size:15px"><b>해설</b><br>${q.exp}</div>
+         ${studyHtml(si, i) || '<p class="note">관련 학습 자료가 없습니다.</p>'}
+         <div class="actions">
+           <button class="primary one">이 문제 다시 풀기</button>
+           <button class="tog">${w.mastered ? '미해결로 되돌리기' : '극복으로 표시'}</button>
+           <button class="del">오답노트에서 삭제</button>
+           <button class="goQ">원래 회차에서 보기</button>
+         </div>`;
+      fillCode(card, q);
+      card.querySelector('.one').addEventListener('click', () => { show('retest', false); startRetest([k]); });
+      card.querySelector('.tog').addEventListener('click', () => { w.mastered = !w.mastered; save(); refreshBadges(); renderNote(); });
+      card.querySelector('.del').addEventListener('click', () => { if (window.confirm('이 문제를 오답노트에서 삭제할까요?')){ delete WR[k]; save(); refreshBadges(); renderNote(); } });
+      card.querySelector('.goQ').addEventListener('click', () => { show(si, false); const el = $(`s${si}q${i+1}`); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); });
+      list.appendChild(card);
+    });
+  }
+  ['nStatus','nCat','nSet','nSort'].forEach(id => $(id).addEventListener('change', renderNote));
+  $('nSearch').addEventListener('input', renderNote);
+  $('nRetest').addEventListener('click', () => { const keys = noteKeys(); if (keys.length){ show('retest', false); startRetest(keys); } });
+  $('nPrint').addEventListener('click', () => {
+    document.querySelectorAll('#nList details').forEach(d => d.open = true);
+    window.print();
+  });
+  $('nClear').addEventListener('click', () => {
+    if (!Object.keys(WR).length) return;
+    if (!window.confirm('오답노트의 모든 기록을 삭제할까요? 되돌릴 수 없습니다.')) return;
+    WR = {}; save(); refreshBadges(); renderNote();
+  });
+
+  function refreshBadges(){
+    const open = Object.values(WR).filter(w=>!w.mastered).length, all = Object.keys(WR).length;
+    const b1 = $('badge-retest'), b2 = $('badge-note');
+    b1.textContent = open; b1.style.display = open ? '' : 'none';
+    b2.textContent = all; b2.style.display = all ? '' : 'none';
+    b2.style.background = 'var(--accent)';
+    if (view === 'retest' && !R) renderRetestSetup();
+  }
+
+  /* ---------- timer & theme ---------- */
+  const tEl = $('timer');
+  function renderTimer(){
+    if (!isSet()) return;
+    const r = S[view].remain;
+    if (r === 0){ tEl.textContent = '시간 종료'; return; }
+    const h = Math.floor(r/3600), m = Math.floor(r%3600/60), s = r%60;
+    tEl.textContent = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  function checkTimeUp(){
+    if (!isSet()) return;
+    const set = S[view];
+    $('timeup'+view).style.display = set.remain === 0 && !set.finished && !set.tuDismissed ? 'block' : 'none';
+  }
+  setInterval(() => {
+    if (!isSet()) return;
+    const set = S[view];
+    if (!set.finished && set.remain > 0){
+      set.remain--;
+      if (set.remain % 10 === 0 && document.visibilityState !== 'hidden') saveProgress();
+      if (set.remain === 0){ saveProgress(); checkTimeUp(); $('timeup'+view).scrollIntoView({behavior:'smooth', block:'start'}); }
+    }
+    renderTimer();
+  }, 1000);
+  window.addEventListener('pagehide', saveProgress);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveProgress(); });
+  document.querySelectorAll('.themeBtn').forEach(b => b.addEventListener('click', () => {
+    const r = document.documentElement;
+    const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    r.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('jpk2026_3_theme', r.dataset.theme); } catch(e) {}
+  }));
+  try { const t = localStorage.getItem('jpk2026_3_theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch(e) {}
+
+  // (re)build every set from saved data; answers are re-graded so results always match the current grading rules
+  function applyProgress(data){ S.forEach((set, si) => {
+    set.remain = 150*60; set.finished = false; set.tuDismissed = false; set.st = freshSt(set.E);
+    $('set'+si).querySelectorAll('article.card').forEach(resetCard);
+    const f = $('final'+si); f.style.display='none'; f.innerHTML='';
+    $('timeup'+si).style.display = 'none';
+    const sv = Array.isArray(data) ? data[si] : null;
+    if (!sv || !Array.isArray(sv.st) || sv.st.length !== set.st.length) return;
+    if (typeof sv.remain === 'number' && sv.remain >= 0) set.remain = Math.min(150*60, Math.floor(sv.remain));
+    sv.st.forEach((x, i) => {
+      if (!x) return;
+      const q = set.E.questions[i], s = set.st[i];
+      const card = $(`s${si}q${i+1}`);
+      const inputs = [...card.querySelectorAll('.blank input')];
+      const vals = Array.isArray(x.vals) ? x.vals : [];
+      inputs.forEach((inp, k) => inp.value = typeof vals[k] === 'string' ? vals[k] : '');
+      s.vals = inputs.map(inp => inp.value);
+      if (x.submitted){
+        s.submitted = true; s.marks = grade(q, s.vals); s.override = !!x.override;
+        card.dataset.submitted = '1';
+        inputs.forEach((inp, k) => { inp.disabled = true; inp.classList.add(s.marks[k] ? 'ok' : 'bad'); });
+        card.querySelector('.sub').disabled = true;
+        renderSetResult(si, i);
+      }
+    });
+    if (doneCnt(si) === set.st.length) set.finished = true;
+  }); }
+  applyProgress(saved);
+
+  // 7: tell the user when the browser refuses to store anything
+  try { localStorage.setItem('jpk2026_3_probe', '1'); localStorage.removeItem('jpk2026_3_probe'); }
+  catch(e) { $('storageWarn').style.display = 'block'; }
+
+  // 9: another tab/window changed the record
+  function loadLatest(){
+    syncPending = false; $('syncWarn').style.display = 'none';
+    let d = null; try { d = JSON.parse(localStorage.getItem(PK) || 'null'); } catch(e) {}
+    const keepView = view;
+    applyProgress(d);
+    show(keepView, false);
+  }
+  window.addEventListener('storage', e => {
+    if (e.key === LS_KEY){
+      try { WR = JSON.parse(e.newValue || '{}') || {}; } catch(err) { WR = {}; }
+      refreshBadges();
+      if (view === 'note') renderNote();
+    } else if (e.key === PK){
+      if (document.visibilityState === 'hidden') loadLatest();      // background tab: follow the newest record
+      else { syncPending = true; $('syncWarn').style.display = 'block'; }
+    }
+  });
+  $('syncLoad').addEventListener('click', loadLatest);
+  $('syncIgnore').addEventListener('click', () => { syncPending = false; $('syncWarn').style.display = 'none'; saveProgress(); });
+
+  refreshBadges();
+  // 3: '#setN', '#sXqY' (question links), '#note', '#retest'
+  const h = location.hash;
+  const m = h.match(/^#set(\d+)$/), mq = h.match(/^#s(\d+)q(\d+)$/);
+  if (mq && +mq[1] < S.length){
+    show(+mq[1], false);
+    const el = $(`s${mq[1]}q${mq[2]}`); if (el) setTimeout(() => el.scrollIntoView({block:'start'}), 0);
+  } else show(m && +m[1] >= 1 && +m[1] <= S.length ? +m[1]-1 : h === '#note' ? 'note' : h === '#retest' ? 'retest' : 0, false);
+})();
+</script>
+</body>
+</html>
