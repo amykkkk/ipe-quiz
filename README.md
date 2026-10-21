@@ -3,6 +3,14 @@
 2026년 정기기사 제3회 대비 **정보처리기사 실기(필답형) 예상문제 10회분, 200문항**을 풀고, 자동으로 채점받고, 틀린 문제를 오답노트와 재시험으로 복습하는 웹 페이지입니다.
 설치 없이 HTML 파일 하나(`docs/index.html`)로 동작합니다.
 
+### 👉 [모의고사 바로 풀기](https://htmlpreview.github.io/?https://github.com/amykkkk/ipe-quiz/blob/main/docs/index.html)
+
+| 바로가기 | 링크 |
+|---|---|
+| ▶️ 브라우저에서 바로 풀기 | [htmlpreview로 열기](https://htmlpreview.github.io/?https://github.com/amykkkk/ipe-quiz/blob/main/docs/index.html) |
+| 🌐 GitHub Pages 주소 | [amykkkk.github.io/ipe-quiz](https://amykkkk.github.io/ipe-quiz/) (Pages를 켠 뒤 사용 가능, 아래 사용 방법 참고) |
+| 💾 파일 내려받기 | [index.html 다운로드](https://raw.githubusercontent.com/amykkkk/ipe-quiz/main/docs/index.html) (열린 화면에서 `Ctrl+S`로 저장한 뒤 더블클릭) |
+
 > ⚠️ 최근 출제 경향(2021~2026년 2회)을 바탕으로 만든 **예상 문제**이며, 실제 기출문제나 공식 자료가 아닙니다.
 
 ## 주요 기능
@@ -35,10 +43,11 @@
 
 ## 사용 방법
 
-- **바로 풀기:** `docs/index.html`을 내려받아 브라우저로 열면 됩니다(인터넷 연결 불필요).
-- **웹에서 풀기 (GitHub Pages):** 저장소 Settings → Pages → Branch `main`, 폴더 `/docs`로 설정하면 `https://<계정>.github.io/ipe-quiz/` 주소로 공개됩니다.
+- **바로 풀기:** 위의 [모의고사 바로 풀기](https://htmlpreview.github.io/?https://github.com/amykkkk/ipe-quiz/blob/main/docs/index.html) 링크를 누르면 설치 없이 브라우저에서 바로 열립니다.
+- **내 PC에서 풀기:** `docs/index.html`을 내려받아 브라우저로 열면 됩니다(인터넷 연결 불필요).
+- **GitHub Pages로 공개:** 저장소 Settings → Pages → Branch `main`, 폴더 `/docs`로 설정하면 [amykkkk.github.io/ipe-quiz](https://amykkkk.github.io/ipe-quiz/) 주소로 열립니다. 바로가기 링크보다 빠르고 안정적입니다.
 
-기록은 그 브라우저 안에만 저장됩니다. 시크릿 창, 사이트 데이터 삭제, 다른 브라우저나 기기에서는 이어지지 않습니다.
+기록은 그 브라우저 안에 저장되며, **여는 주소마다 따로 저장**됩니다(바로가기 링크, Pages 주소, 내려받은 파일의 기록은 서로 이어지지 않음). 시크릿 창, 사이트 데이터 삭제, 다른 브라우저나 기기에서도 이어지지 않습니다.
 
 ## 프로젝트 구조
 
