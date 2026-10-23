@@ -15,21 +15,28 @@ def read(*parts):
         return f.read()
 
 
+def js_files(sub, prefix=''):
+    return sorted(f for f in os.listdir(os.path.join(SRC, sub)) if f.endswith('.js') and f.startswith(prefix))
+
+
 def build():
-    sets = sorted(f for f in os.listdir(os.path.join(SRC, 'sets')) if f.endswith('.js'))
-    notes = sorted(f for f in os.listdir(os.path.join(SRC, 'notes')) if f.endswith('.js'))
-    if len(sets) != len(notes):
-        sys.exit(f'sets ({len(sets)}) and notes ({len(notes)}) count differ')
+    sets = [('sets', f) for f in js_files('sets')]
+    notes = [('notes', f) for f in js_files('notes')]
+    # 이론계산 sets come after the mock exams so saved records of the exams keep their indexes
+    calc = [('calc', f) for f in js_files('calc', 'calc')]
+    calc_notes = [('calc', f) for f in js_files('calc', 'note')]
+    if len(sets) != len(notes) or len(calc) != len(calc_notes):
+        sys.exit(f'sets ({len(sets)}/{len(calc)}) and notes ({len(notes)}/{len(calc_notes)}) count differ')
 
     # each set file declares `const EXAM`; wrap it so the files don't collide
-    data = [f'EXAMS.push((function(){{\n{read("sets", f)}\nreturn EXAM;\n}})());' for f in sets]
-    data += [read('notes', f) for f in notes]
+    data = [f'EXAMS.push((function(){{\n{read(*p)}\nreturn EXAM;\n}})());' for p in sets + calc]
+    data += [read(*p) for p in notes + calc_notes]
 
     app = read('app.html')
     marker = '/*__DATA__*/'
     if app.count(marker) != 1:
         sys.exit('app.html must contain the data marker exactly once')
-    return read('head.html') + app.replace(marker, '\n'.join(data)), len(sets)
+    return read('head.html') + app.replace(marker, '\n'.join(data)), len(sets) + len(calc)
 
 
 def main():

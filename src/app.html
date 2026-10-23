@@ -1,5 +1,8 @@
 <style>
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 4px}
+.menu{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.menu .tab{font-size:16px;padding:9px 16px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.tabs .tab{font-size:14px;padding:6px 11px}
 .tab{padding:8px 13px;border-radius:10px;font-weight:700;font-size:15px}
 .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
 :root[data-theme="dark"] .tab.active{color:#0d1220}
@@ -55,7 +58,8 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
   <header class="top">
     <div class="kicker">2026년 정기기사 제3회 대비 · 정보처리기사 실기(필답형)</div>
     <h1>정보처리기사 실기 예상문제 모의고사 (제1회~제10회, 총 200문항)</h1>
-    <p>회차별 20문항 · 문항당 5점 · 100점 만점 · 60점 이상 합격 · 답안·점수·남은 시간은 자동 저장되며, 틀린 문제는 자동으로 <b>오답노트</b>에 모이고 <b>오답 재시험</b>으로 다시 풀 수 있습니다.</p>
+    <p>회차별 20문항 · 문항당 5점 · 100점 만점 · 60점 이상 합격 · 답안·점수·남은 시간은 자동 저장되며, 틀린 문제는 자동으로 <b>오답노트</b>에 모이고 <b>오답 재시험</b>으로 다시 풀 수 있습니다. <b>이론계산</b>에서는 스케줄링·페이지 교체·서브넷 등 계산 문제만 유형별 10문항씩 따로 연습할 수 있습니다.</p>
+    <nav class="menu" id="menu"><button class="tab" id="menu-exam">📝 모의고사</button><button class="tab" id="menu-calc">🧮 이론계산</button></nav>
     <nav class="tabs" id="tabs"></nav>
     <div class="card banner" id="storageWarn" style="display:none;margin:10px 0 0">⚠️ <b>이 브라우저에서는 기록이 저장되지 않습니다.</b> 시크릿 창이거나 브라우저 설정에서 사이트 데이터 저장이 차단된 것 같습니다. 지금 풀이는 가능하지만 새로고침하거나 창을 닫으면 답안·점수·오답노트가 사라집니다.</div>
     <div class="card banner" id="syncWarn" style="display:none;margin:10px 0 0">🔄 다른 탭(창)에서 이 모의고사 기록이 변경되었습니다.<div class="actions"><button class="primary" id="syncLoad">최신 기록 불러오기</button><button id="syncIgnore">이 탭 기록 유지</button></div></div>
@@ -65,9 +69,9 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
     <div class="bar-inner">
       <div class="stats">
         <span><b id="setName">제1회</b></span>
-        <span>제출 <b id="done">0</b>/20</span>
+        <span>제출 <b id="done">0</b>/<b id="qTotal">20</b></span>
         <span>현재 점수 <b id="cur">0</b>점</span>
-        <span>남은 시간 <b id="timer">2:30:00</b></span>
+        <span id="timerWrap">남은 시간 <b id="timer">2:30:00</b></span>
       </div>
       <div style="display:flex;gap:6px">
         <button class="themeBtn" title="테마 전환">🌓</button>
@@ -111,7 +115,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
       <div class="filters">
         <label>상태 <select id="nStatus"><option value="all">전체</option><option value="open">미해결</option><option value="done">극복</option></select></label>
         <label>영역 <select id="nCat"></select></label>
-        <label>회차 <select id="nSet"></select></label>
+        <label>회차·유형 <select id="nSet"></select></label>
         <label>정렬 <select id="nSort"><option value="set">회차·번호순</option><option value="cnt">많이 틀린 순</option><option value="cat">영역별</option></select></label>
         <input type="search" id="nSearch" placeholder="키워드 검색 (예: 정규화, 포인터)">
       </div>
@@ -128,17 +132,17 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
     <div class="actions" style="margin-top:0">
       <button id="submitAll2" class="primary">전체 제출·채점</button>
       <button id="resetBtn">이 회차 다시 풀기</button>
-      <button id="resetAllBtn">전체 회차 기록 초기화</button>
+      <button id="resetAllBtn">전체 기록 초기화</button>
     </div>
     <div class="pager" style="margin-top:12px">
-      <button id="prevBtn">◀ 이전 회차</button>
-      <button id="nextBtn">다음 회차 ▶</button>
+      <button id="prevBtn">◀ 이전</button>
+      <button id="nextBtn">다음 ▶</button>
     </div>
     <p class="note" style="margin:12px 0 0">※ 회차마다 답안(입력 중인 답 포함)·채점 결과·남은 시간이 <b>이 브라우저에 자동 저장</b>되어, 새로고침하거나 나중에 다시 열어도 이어서 풀 수 있습니다(보고 있는 회차만 타이머가 흐름). 기록을 지우려면 [이 회차 다시 풀기] 또는 [전체 회차 기록 초기화]를 누르세요. 틀리거나 부분 정답인 문제는 <b>오답노트</b>에 자동 저장됩니다. 자동 채점은 띄어쓰기·대소문자(용어 문항)를 무시하고 괄호 안팎 표기도 인정합니다. 의미상 맞는데 오답 처리되면 <b>[내 답 정답 인정]</b>을 누르세요(오답노트에서도 빠집니다). 코드 실행 결과 문항은 대소문자와 값 사이 띄어쓰기를 구분합니다. 빈칸이 여러 개인 문항에서 <b>Enter</b>는 다음 칸으로 이동하고, 마지막 칸에서 누르면 제출됩니다.</p>
   </div>
 
   <section class="card" id="overviewCard">
-    <div class="note">전체 회차 성적표</div>
+    <div class="note">전체 성적표</div>
     <div class="tblwrap"><table class="overview" id="overview"></table></div>
   </section>
   <footer>본 문제는 최근 5년(2021~2026년 2회) 출제 경향을 분석해 만든 예상 문제이며 실제 시험 문제가 아닙니다.</footer>
@@ -290,6 +294,13 @@ const NOTES = [];
   /* ---------- exam sets ---------- */
   const freshSt = E => E.questions.map(q => ({submitted:false, marks:q.ans.map(()=>false), override:false, vals:q.ans.map(()=>'')}));
   const S = EXAMS.map(E => ({ E, remain: 150*60, finished:false, st: freshSt(E) }));
+  // two groups of sets: mock exams (제N회, timed) and 이론계산 practice (E.calc, untimed)
+  const isCalc = si => !!S[si].E.calc;
+  const groupOf = si => isCalc(si) ? 'calc' : 'exam';
+  const groupSets = g => S.map((_, k) => k).filter(k => groupOf(k) === g);
+  const nameOf = si => isCalc(si) ? S[si].E.short : `제${si+1}회`;
+  const hashOf = si => isCalc(si) ? '#calc' + (groupSets('calc').indexOf(si) + 1) : '#set' + (si + 1);
+  const lastSet = {exam: 0, calc: groupSets('calc')[0]};
 
   /* ---------- progress storage (answers, scores, timers) ---------- */
   const PK = 'jpk2026_3_progress_v1';
@@ -319,7 +330,7 @@ const NOTES = [];
     tabs.appendChild(t);
     const box = document.createElement('section');
     box.className = 'view'; box.id = 'set'+si;
-    box.innerHTML = `<section class="card banner" id="timeup${si}" style="display:none"><b>⏰ 제${si+1}회 시험 시간(2시간 30분)이 끝났습니다.</b><br><span class="note">실제 시험이라면 여기서 답안지를 제출합니다.</span><div class="actions"><button class="primary tuSubmit">입력한 답으로 지금 제출·채점</button><button class="tuKeep">시간 초과로 계속 풀기</button></div></section><section class="card" id="final${si}" style="display:none"></section><main></main>`;
+    box.innerHTML = `<section class="card banner" id="timeup${si}" style="display:none"><b>⏰ ${esc(nameOf(si))} 시험 시간(2시간 30분)이 끝났습니다.</b><br><span class="note">실제 시험이라면 여기서 답안지를 제출합니다.</span><div class="actions"><button class="primary tuSubmit">입력한 답으로 지금 제출·채점</button><button class="tuKeep">시간 초과로 계속 풀기</button></div></section><section class="card" id="final${si}" style="display:none"></section><main></main>`;
     box.querySelector('.tuSubmit').addEventListener('click', () => { box.querySelector('#timeup'+si).style.display='none'; set.E.questions.forEach((_,i) => $(`s${si}q${i+1}`).submit()); });
     box.querySelector('.tuKeep').addEventListener('click', () => { set.tuDismissed = true; box.querySelector('#timeup'+si).style.display='none'; });
     setsBox.appendChild(box);
@@ -343,7 +354,11 @@ const NOTES = [];
     t.className = 'tab special'; t.id = 'tab-'+v;
     t.innerHTML = label + `<span class="badge" id="badge-${v}" style="display:none"></span>`;
     t.addEventListener('click', () => show(v, true));
-    tabs.appendChild(t);
+    $('menu').appendChild(t);
+  });
+  ['exam','calc'].forEach(g => {
+    if (!groupSets(g).length) $('menu-'+g).style.display = 'none';
+    $('menu-'+g).addEventListener('click', () => show(lastSet[g], true));
   });
 
   function renderSetResult(si, i){
@@ -371,30 +386,38 @@ const NOTES = [];
     document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
     if (isSet()){
-      $('set'+v).classList.add('active'); $('tab'+v).classList.add('active');
-      $('prevBtn').disabled = v === 0; $('nextBtn').disabled = v === S.length - 1;
+      const g = groupOf(v), grp = groupSets(g), unit = g === 'calc' ? '유형' : '회차';
+      lastSet[g] = v;
+      $('set'+v).classList.add('active'); $('tab'+v).classList.add('active'); $('menu-'+g).classList.add('active');
+      S.forEach((_, k) => { $('tab'+k).style.display = groupOf(k) === g ? '' : 'none'; });
+      $('prevBtn').disabled = v === grp[0]; $('nextBtn').disabled = v === grp[grp.length-1];
+      $('prevBtn').textContent = `◀ 이전 ${unit}`; $('nextBtn').textContent = `다음 ${unit} ▶`;
+      $('resetBtn').textContent = `이 ${unit} 다시 풀기`;
+      $('timerWrap').style.display = g === 'calc' ? 'none' : '';
       buildNav(); updateSet(); renderTimer(); checkTimeUp();
     } else {
       $('view-'+v).classList.add('active'); $('tab-'+v).classList.add('active');
       if (v === 'note') renderNote(); else renderRetestSetup();
     }
+    tabs.style.display = isSet() ? '' : 'none';
     $('setBar').style.display = isSet() ? '' : 'none';
     $('setFooter').style.display = isSet() ? '' : 'none';
     $('overviewCard').style.display = v === 'note' ? 'none' : '';
-    try { history.replaceState(null, '', '#' + (isSet() ? 'set' + (v+1) : v)); } catch(e) {}
+    try { history.replaceState(null, '', isSet() ? hashOf(v) : '#' + v); } catch(e) {}
     if (scroll) window.scrollTo({top:0, behavior:'smooth'});
   }
 
   function updateSet(){
     S.forEach((_, k) => {
       const d = doneCnt(k), n = S[k].E.questions.length;
-      $('tab'+k).innerHTML = `제${k+1}회<small>${d === n ? total(k)+'점' : d ? d+'/'+n : ''}</small>`;
+      $('tab'+k).innerHTML = `${esc(nameOf(k))}<small>${d === n ? total(k)+'점' : d ? d+'/'+n : ''}</small>`;
     });
     renderOverview();
     if (!isSet()) return;
     const si = view;
-    $('setName').textContent = `제${si+1}회`;
+    $('setName').textContent = nameOf(si);
     $('done').textContent = doneCnt(si);
+    $('qTotal').textContent = S[si].E.questions.length;
     $('cur').textContent = total(si);
     if (doneCnt(si) === S[si].E.questions.length) showFinal(si);
   }
@@ -407,24 +430,26 @@ const NOTES = [];
 
   function showFinal(si){
     const Q = S[si].E.questions, f = $('final'+si);
-    const tot = total(si), pass = tot >= 60;
+    const calc = isCalc(si), max = Q.length * PTS, grp = groupSets(groupOf(si)), next = grp[grp.indexOf(si) + 1];
+    const tot = total(si), pass = calc ? tot >= max * 0.6 : tot >= 60;
+    const verdict = calc ? `/ ${max}점 · 정답률 ${Math.round(tot / max * 1000) / 10}%` : pass ? '합격 🎉' : '불합격';
     const cats = {};
     Q.forEach((q,i) => { const c = q.cat; cats[c] = cats[c] || {got:0,max:0,cnt:0}; cats[c].got += qScore(si,i); cats[c].max += PTS; cats[c].cnt++; });
     const wrong = Q.map((q,i)=>({i,sc:qScore(si,i)})).filter(x=>x.sc<PTS);
     const firstTime = !S[si].finished;
     S[si].finished = true;
     f.style.display = 'block';
-    f.innerHTML = `<div class="note">제${si+1}회 최종 채점 결과</div>
-      <div class="score-big ${pass?'pass':'fail'}">${tot}점 <span style="font-size:22px">${pass?'합격 🎉':'불합격'}</span></div>
-      <p class="note" style="margin:4px 0 0">정답 ${Q.filter((_,i)=>qScore(si,i)===PTS).length}문항 · 부분 정답 ${Q.filter((_,i)=>qScore(si,i)>0&&qScore(si,i)<PTS).length}문항 · 오답 ${Q.filter((_,i)=>qScore(si,i)===0).length}문항 (합격 기준 60점)</p>
+    f.innerHTML = `<div class="note">${esc(nameOf(si))} 최종 채점 결과</div>
+      <div class="score-big ${pass?'pass':'fail'}">${tot}점 <span style="font-size:22px">${verdict}</span></div>
+      <p class="note" style="margin:4px 0 0">정답 ${Q.filter((_,i)=>qScore(si,i)===PTS).length}문항 · 부분 정답 ${Q.filter((_,i)=>qScore(si,i)>0&&qScore(si,i)<PTS).length}문항 · 오답 ${Q.filter((_,i)=>qScore(si,i)===0).length}문항${calc ? '' : ' (합격 기준 60점)'}</p>
       ${catTable(cats)}
       ${wrong.length ? `<p style="margin:12px 0 0;font-size:14px"><b>복습할 문항:</b> ${wrong.map(w=>`<a href="#s${si}q${w.i+1}">${w.i+1}번(${esc(Q[w.i].cat)})</a>`).join(', ')}</p>` : '<p><b>만점입니다!</b></p>'}
       <div class="actions">
-        ${wrong.length ? `<button class="primary goRetest">이 회차 오답 ${wrong.length}문항 재시험 🔁</button><button class="goNote">오답노트 보기 📒</button>` : ''}
-        ${si < S.length-1 ? `<button class="goNext">제${si+2}회 풀러 가기 ▶</button>` : ''}
+        ${wrong.length ? `<button class="primary goRetest">이 ${calc ? '유형' : '회차'} 오답 ${wrong.length}문항 재시험 🔁</button><button class="goNote">오답노트 보기 📒</button>` : ''}
+        ${next !== undefined ? `<button class="goNext">${esc(nameOf(next))} 풀러 가기 ▶</button>` : ''}
       </div>`;
     const b = sel => f.querySelector(sel);
-    if (b('.goNext')) b('.goNext').addEventListener('click', () => show(si+1, true));
+    if (b('.goNext')) b('.goNext').addEventListener('click', () => show(next, true));
     if (b('.goNote')) b('.goNote').addEventListener('click', () => { $('nSet').value = String(si); $('nStatus').value = 'open'; show('note', true); });
     if (b('.goRetest')) b('.goRetest').addEventListener('click', () => { show('retest', false); startRetest(wrong.map(w => keyOf(si, w.i))); });
     if (firstTime && si === view) f.scrollIntoView({behavior:'smooth', block:'start'});
@@ -432,29 +457,31 @@ const NOTES = [];
 
   function renderOverview(){
     const rows = S.map((s,k) => {
-      const d = doneCnt(k), n = s.E.questions.length, t = total(k);
-      const status = d === n ? (t >= 60 ? '<span class="pass">합격</span>' : '<span class="fail">불합격</span>') : d ? '진행 중' : '미응시';
-      return `<tr><td><a href="#set${k+1}" data-set="${k}">제${k+1}회</a></td><td>${d}/${n}</td><td>${d ? t+'점' : '-'}</td><td>${status}</td></tr>`;
+      const d = doneCnt(k), n = s.E.questions.length, t = total(k), max = n * PTS;
+      const status = d === n ? (isCalc(k) ? `정답률 ${Math.round(t / max * 1000) / 10}%` : t >= 60 ? '<span class="pass">합격</span>' : '<span class="fail">불합격</span>') : d ? '진행 중' : '미응시';
+      const head = k === groupSets('calc')[0] ? '<tr><th colspan="4">🧮 이론계산</th></tr>' : '';
+      return `${head}<tr><td><a href="${hashOf(k)}" data-set="${k}">${esc(nameOf(k))}</a></td><td>${d}/${n}</td><td>${d ? t + (isCalc(k) ? '/' + max : '') + '점' : '-'}</td><td>${status}</td></tr>`;
     }).join('');
-    const fin = S.map((_,k)=>k).filter(k=>doneCnt(k)===S[k].E.questions.length);
+    const fin = groupSets('exam').filter(k=>doneCnt(k)===S[k].E.questions.length);
     const avg = fin.length ? Math.round(fin.reduce((a,k)=>a+total(k),0)/fin.length*10)/10 : null;
     const ov = $('overview');
-    ov.innerHTML = `<thead><tr><th>회차</th><th>제출</th><th>점수</th><th>결과</th></tr></thead><tbody>${rows}</tbody>` +
-      (avg !== null ? `<tfoot><tr><td><b>완료 회차 평균</b></td><td>${fin.length}회</td><td><b>${avg}점</b></td><td></td></tr></tfoot>` : '');
+    ov.innerHTML = `<thead><tr><th>회차·유형</th><th>제출</th><th>점수</th><th>결과</th></tr></thead><tbody>${rows}</tbody>` +
+      (avg !== null ? `<tfoot><tr><td><b>모의고사 완료 회차 평균</b></td><td>${fin.length}회</td><td><b>${avg}점</b></td><td></td></tr></tfoot>` : '');
     ov.querySelectorAll('a[data-set]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); show(+a.dataset.set, true); }));
   }
 
   function submitAll(){
     const left = S[view].st.filter(s=>!s.submitted).length;
-    if (left && !window.confirm(`제${view+1}회에 아직 제출하지 않은 ${left}문항이 있습니다. 입력한 답으로 모두 제출하고 채점할까요?`)) return;
+    if (left && !window.confirm(`${nameOf(view)}에 아직 제출하지 않은 ${left}문항이 있습니다. 입력한 답으로 모두 제출하고 채점할까요?`)) return;
     S[view].E.questions.forEach((_,i) => $(`s${view}q${i+1}`).submit());
   }
   $('submitAll').addEventListener('click', submitAll);
   $('submitAll2').addEventListener('click', submitAll);
-  $('prevBtn').addEventListener('click', () => view > 0 && show(view-1, true));
-  $('nextBtn').addEventListener('click', () => view < S.length-1 && show(view+1, true));
+  const step = d => { const grp = groupSets(groupOf(view)), k = grp[grp.indexOf(view) + d]; if (k !== undefined) show(k, true); };
+  $('prevBtn').addEventListener('click', () => step(-1));
+  $('nextBtn').addEventListener('click', () => step(1));
   $('resetBtn').addEventListener('click', () => {
-    if (!window.confirm(`제${view+1}회의 답안을 모두 지우고 다시 풀까요? (오답노트는 유지됩니다)`)) return;
+    if (!window.confirm(`${nameOf(view)}의 답안을 모두 지우고 다시 풀까요? (오답노트는 유지됩니다)`)) return;
     const set = S[view];
     set.remain = 150*60; set.finished = false; set.tuDismissed = false;
     set.st = freshSt(set.E);
@@ -465,7 +492,7 @@ const NOTES = [];
     window.scrollTo({top:0, behavior:'smooth'});
   });
   $('resetAllBtn').addEventListener('click', () => {
-    if (!window.confirm('제1회~제' + S.length + '회의 답안·점수·남은 시간을 모두 지울까요? (오답노트는 유지됩니다)')) return;
+    if (!window.confirm('모의고사 전 회차와 이론계산 전 유형의 답안·점수·남은 시간을 모두 지울까요? (오답노트는 유지됩니다)')) return;
     applyProgress(null);
     saveProgress(); show(0, true);
   });
@@ -473,7 +500,7 @@ const NOTES = [];
   /* ---------- retest ---------- */
   let R = null; // {keys, res:{key:{marks,override}}}
   const catsAll = [...new Set(EXAMS.flatMap(E => E.questions.map(q => q.cat)))];
-  $('nSet').innerHTML = '<option value="all">전체</option>' + EXAMS.map((_,k)=>`<option value="${k}">제${k+1}회</option>`).join('');
+  $('nSet').innerHTML = '<option value="all">전체</option>' + EXAMS.map((_,k)=>`<option value="${k}">${esc(nameOf(k))}</option>`).join('');
   [$('rCat'), $('nCat')].forEach(s => { s.innerHTML = '<option value="all">전체</option>' + catsAll.map(c=>`<option>${esc(c)}</option>`).join(''); });
 
   function poolKeys(scope, cat){
@@ -507,7 +534,7 @@ const NOTES = [];
     keys.forEach((k, idx) => {
       const {si, i, q} = Qof(k);
       const w = WR[k];
-      const head = `<span class="meta">제${si+1}회 ${i+1}번${w ? ` · 틀린 횟수 ${w.cnt}` : ''}</span>`;
+      const head = `<span class="meta">${esc(nameOf(si))} ${i+1}번${w ? ` · 틀린 횟수 ${w.cnt}` : ''}</span>`;
       const card = makeCard('r'+idx, q, idx+1, head, (vals, marks) => {
         R.res[k] = {marks, override:false};
         if (scoreOf(marks,false) === PTS) recordRight(si, i); else recordWrong(si, i, vals);
@@ -617,7 +644,7 @@ const NOTES = [];
       const card = document.createElement('article');
       card.className = 'card';
       card.innerHTML = questionHtml(q, 'n'+idx, idx+1,
-          `<span class="meta">제${si+1}회 ${i+1}번 · 틀린 횟수 ${w.cnt}회</span><span class="st ${w.mastered?'done':'open'}">${w.mastered?'극복':'미해결'}</span>`) +
+          `<span class="meta">${esc(nameOf(si))} ${i+1}번 · 틀린 횟수 ${w.cnt}회</span><span class="st ${w.mastered?'done':'open'}">${w.mastered?'극복':'미해결'}</span>`) +
         `<div class="cmp"><div class="mine"><b>마지막에 쓴 내 답</b>${mine || '<span class="note">(기록 없음)</span>'}</div><div class="right"><b>정답${q.unordered ? ' (순서 무관)' : ''}</b>${ansHtml(q)}</div></div>
          <div class="exp" style="font-size:15px"><b>해설</b><br>${q.exp}</div>
          ${studyHtml(si, i) || '<p class="note">관련 학습 자료가 없습니다.</p>'}
@@ -674,7 +701,7 @@ const NOTES = [];
   setInterval(() => {
     if (!isSet()) return;
     const set = S[view];
-    if (!set.finished && set.remain > 0){
+    if (!set.finished && set.remain > 0 && !set.E.calc){
       set.remain--;
       if (set.remain % 10 === 0 && document.visibilityState !== 'hidden') saveProgress();
       if (set.remain === 0){ saveProgress(); checkTimeUp(); $('timeup'+view).scrollIntoView({behavior:'smooth', block:'start'}); }
@@ -746,13 +773,14 @@ const NOTES = [];
   $('syncIgnore').addEventListener('click', () => { syncPending = false; $('syncWarn').style.display = 'none'; saveProgress(); });
 
   refreshBadges();
-  // 3: '#setN', '#sXqY' (question links), '#note', '#retest'
+  // 3: '#setN', '#calcN', '#sXqY' (question links), '#note', '#retest'
   const h = location.hash;
-  const m = h.match(/^#set(\d+)$/), mq = h.match(/^#s(\d+)q(\d+)$/);
+  const m = h.match(/^#(set|calc)(\d+)$/), mq = h.match(/^#s(\d+)q(\d+)$/);
+  const fromHash = m && groupSets(m[1] === 'set' ? 'exam' : 'calc')[+m[2] - 1];
   if (mq && +mq[1] < S.length){
     show(+mq[1], false);
     const el = $(`s${mq[1]}q${mq[2]}`); if (el) setTimeout(() => el.scrollIntoView({block:'start'}), 0);
-  } else show(m && +m[1] >= 1 && +m[1] <= S.length ? +m[1]-1 : h === '#note' ? 'note' : h === '#retest' ? 'retest' : 0, false);
+  } else show(fromHash !== undefined && fromHash !== null ? fromHash : h === '#note' ? 'note' : h === '#retest' ? 'retest' : 0, false);
 })();
 </script>
 </body>
