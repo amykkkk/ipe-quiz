@@ -5,7 +5,7 @@
   "description": "정보처리기사 실기 예상문제 모의고사 (10회 200문항) - 자동 채점, 오답노트, 오답 재시험",
   "scripts": {
     "build": "python build.py",
-    "test": "python build.py && node tests/content.js && node tests/ui-fixes.js && node tests/ui-progress.js && node tests/ui-all-sets.js && node tests/ui-retest-note.js"
+    "test": "python build.py && node tests/content.js && node tests/ui-fixes.js && node tests/ui-progress.js && node tests/ui-all-sets.js && node tests/ui-retest-note.js && node tests/ui-cloud.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3"

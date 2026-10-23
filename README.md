@@ -17,6 +17,7 @@
 - **📒 오답노트:** 틀린 문제가 자동으로 모임. 내 답과 정답 비교, 해설, 문항별 학습 자료(핵심 개념, 비교표, 함정 포인트, 암기 팁, 관련 키워드), 취약 영역 그래프, 필터·검색·정렬, 인쇄/PDF 저장
 - **🔁 오답 재시험:** 미해결 오답만 모아 다시 풀기. 맞히면 '극복'으로 표시
 - **자동 저장:** 답안(입력 중인 답 포함), 점수, 남은 시간, 오답노트를 브라우저에 저장해 새로고침 후에도 이어서 풀 수 있음. 여러 탭에서 열어도 서로 덮어쓰지 않도록 동기화
+- **☁️ Google 로그인:** 로그인하면 기록이 계정에 저장되어 다른 기기·브라우저에서도 이어서 풀 수 있음. 로그인 전에 푼 기록도 합쳐짐
 - 다크 모드, 모바일 화면 지원
 
 ## 출제 구성
@@ -40,6 +41,27 @@
 [모의고사 바로 풀기](https://amykkkk.github.io/ipe-quiz/) 링크를 누르면 바로 열립니다.
 
 풀이 기록은 그 브라우저 안에 저장됩니다. 시크릿 창, 사이트 데이터 삭제, 다른 브라우저나 기기에서는 이어지지 않습니다.
+위쪽의 [Google 로그인]을 누르면 기록이 Google 계정에 저장되어 어디서든 이어서 풀 수 있습니다. 로그아웃해도 그 브라우저의 기록은 남습니다.
+
+## Google 로그인 설정 (Firebase)
+
+별도 서버 없이 Firebase Authentication(Google 로그인)과 Firestore(기록 저장)를 씁니다. 무료 요금제(Spark)로 충분합니다.
+
+1. [Firebase 콘솔](https://console.firebase.google.com/)에서 프로젝트를 만들고, **웹 앱**을 추가해 `firebaseConfig` 값을 복사합니다.
+2. **Authentication > 로그인 방법**에서 **Google**을 사용 설정합니다.
+3. **Authentication > 설정 > 승인된 도메인**에 `amykkkk.github.io`를 추가합니다(`localhost`는 기본 포함).
+4. **Firestore Database**를 만들고, **규칙** 탭에 [`firestore.rules`](firestore.rules) 내용을 붙여 넣어 게시합니다. 각 사용자는 `users/{uid}` 문서 하나에 자기 기록만 읽고 쓸 수 있습니다.
+5. `src/app.html` 위쪽의 `const FIREBASE_CONFIG = null;`을 복사한 값으로 바꾸고 `python build.py`를 실행합니다.
+   ```js
+   const FIREBASE_CONFIG = { apiKey: "...", authDomain: "...", projectId: "...", appId: "..." };
+   ```
+   이 값은 공개되어도 괜찮습니다. 데이터 보호는 4번의 보안 규칙이 담당합니다.
+
+동기화 방식:
+- 로그인하면 계정 기록을 불러옵니다. 이 브라우저에 아직 올리지 않은 기록(로그인 전에 푼 것, 오프라인에서 푼 것)이 있으면 회차·오답 문항별로 더 최근에 바뀐 쪽을 골라 합칩니다.
+- 답안 제출, 오답노트 변경은 약 1.5초 뒤 계정에 저장되고, 남은 시간은 1분마다 저장됩니다. 탭을 닫거나 다른 탭으로 넘어갈 때도 바로 저장합니다.
+- 다른 기기에서 바뀐 기록은 이 탭으로 돌아올 때 불러옵니다.
+- `FIREBASE_CONFIG`가 `null`이면 로그인 버튼이 보이지 않고 예전처럼 브라우저에만 저장합니다.
 
 ## 프로젝트 구조
 
@@ -50,7 +72,8 @@ src/
   sets/setNN.js      회차별 문제 20개 (const EXAM = {...})
   notes/noteNN.js    회차별 학습 자료 20개 (NOTES.push([...]))
 build.py             src를 합쳐 docs/index.html 한 파일로 만듦
-tests/               채점·화면 테스트 (jsdom)
+tests/               채점·화면·로그인 동기화 테스트 (jsdom)
+firestore.rules      Firestore 보안 규칙 (Google 로그인 기록 저장용)
 docs/index.html      빌드 결과물 (배포용)
 ```
 
