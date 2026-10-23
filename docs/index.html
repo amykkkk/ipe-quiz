@@ -4,84 +4,105 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>정보처리기사 실기 모의고사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Nanum+Pen+Script&display=swap">
 <style>
+/* minimal focus: grey ground, white cards, one blue accent; code gets syntax colors, grading gets a red pen */
 :root{
-  --bg:#f5f6f8; --card:#ffffff; --text:#1d2330; --muted:#5f6877; --line:#dfe3ea;
-  --accent:#2557d6; --accent-soft:#e8eefc; --ok:#13834a; --ok-soft:#e4f5eb;
+  --bg:#f2f4f7; --card:#ffffff; --text:#191f28; --muted:#6b7684; --line:#e5e8eb;
+  --accent:#2f6fed; --accent-soft:#e8effd; --ok:#13834a; --ok-soft:#e4f5eb;
   --bad:#c62f2f; --bad-soft:#fbe9e9; --warn:#a86400; --warn-soft:#fff3dc;
-  --code-bg:#f2f4f7; --code-text:#1d2330;
+  --code-bg:#f2f4f7; --code-text:#191f28; --field:#f2f4f7; --pen:#d0021b;
+  --hl-kw:#8a3ffc; --hl-str:#1f7a3a; --hl-num:#c2410c; --hl-com:#8b95a1; --hl-fn:#2f6fed;
+  --gnb-h:56px;
+  --f-body:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-code:"JetBrains Mono","D2Coding","Consolas","Menlo",monospace;
+  --f-pen:"Nanum Pen Script","Nanum Pen","Comic Sans MS",cursive;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#13161c; --card:#1c2029; --text:#e6e9ef; --muted:#9aa3b2; --line:#2e3441;
-    --accent:#7ea2ff; --accent-soft:#232d47; --ok:#52c98a; --ok-soft:#18311f;
+    --bg:#101318; --card:#1a1e26; --text:#e6e9ef; --muted:#9aa3b2; --line:#2a303b;
+    --accent:#7ea2ff; --accent-soft:#222c45; --ok:#52c98a; --ok-soft:#18311f;
     --bad:#ff7b7b; --bad-soft:#3a1d1f; --warn:#f0b04a; --warn-soft:#352a14;
-    --code-bg:#11141a; --code-text:#e6e9ef;
+    --code-bg:#12151b; --code-text:#e6e9ef; --field:#232833; --pen:#ff6b6b;
+    --hl-kw:#c792ea; --hl-str:#c3e88d; --hl-num:#f78c6c; --hl-com:#6b7385; --hl-fn:#82aaff;
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#13161c; --card:#1c2029; --text:#e6e9ef; --muted:#9aa3b2; --line:#2e3441;
-  --accent:#7ea2ff; --accent-soft:#232d47; --ok:#52c98a; --ok-soft:#18311f;
+  --bg:#101318; --card:#1a1e26; --text:#e6e9ef; --muted:#9aa3b2; --line:#2a303b;
+  --accent:#7ea2ff; --accent-soft:#222c45; --ok:#52c98a; --ok-soft:#18311f;
   --bad:#ff7b7b; --bad-soft:#3a1d1f; --warn:#f0b04a; --warn-soft:#352a14;
-  --code-bg:#11141a; --code-text:#e6e9ef;
+  --code-bg:#12151b; --code-text:#e6e9ef; --field:#232833; --pen:#ff6b6b;
+  --hl-kw:#c792ea; --hl-str:#c3e88d; --hl-num:#f78c6c; --hl-com:#6b7385; --hl-fn:#82aaff;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;line-height:1.65;font-size:16px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.65;font-size:16px}
 .wrap{max-width:860px;margin:0 auto;padding:0 16px 80px}
-header.top{padding:28px 0 12px}
-header.top .kicker{color:var(--accent);font-weight:700;font-size:14px;letter-spacing:.02em}
-header.top h1{margin:4px 0 6px;font-size:26px;line-height:1.3}
-header.top p{margin:0;color:var(--muted);font-size:14px}
-.bar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:18px}
+.phead{padding:28px 0 6px}
+.phead h1{margin:0;font-size:26px;line-height:1.3;letter-spacing:-.01em}
+.phead p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.bar{position:sticky;top:var(--gnb-h);z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:18px}
 .bar-inner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .stats{display:flex;gap:14px;font-size:14px;color:var(--muted);flex-wrap:wrap}
 .stats b{color:var(--text);font-variant-numeric:tabular-nums}
 .nav{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-.nav a{width:30px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;font-size:12px;color:var(--muted);text-decoration:none;background:var(--card)}
+.nav a{width:30px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--muted);text-decoration:none;background:var(--card);font-family:var(--f-code)}
 .nav a.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
 .nav a.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);font-weight:700}
 .nav a.part{background:var(--warn-soft);border-color:var(--warn);color:var(--warn);font-weight:700}
-button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;font-size:14px}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;font-size:14px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
 :root[data-theme="dark"] button.primary{color:#0d1220}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button.primary{color:#0d1220}}
 button:disabled{opacity:.5;cursor:default}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;scroll-margin-top:110px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;scroll-margin-top:calc(var(--gnb-h) + 110px)}
 .qhead{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.qnum{font-weight:800;font-size:18px}
-.chip{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.qnum{font-weight:700;font-size:18px;position:relative;font-variant-numeric:tabular-nums}
+.chip{font-size:12px;padding:2px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700}
 .pts{margin-left:auto;font-size:13px;color:var(--muted)}
-.qtext{margin:0 0 12px}
+.qtext{margin:0 0 14px;font-size:16.5px}
 .qtext table{border-collapse:collapse;margin:8px 0;font-size:14px}
 .qtext th,.qtext td{border:1px solid var(--line);padding:4px 10px;text-align:center}
 .qtext th{background:var(--code-bg)}
-.qtext .box{border:1px dashed var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;background:var(--code-bg);font-size:15px}
+.qtext .box{border:1px dashed var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:var(--code-bg);font-size:15px}
 .tblwrap{overflow-x:auto}
-pre.code{background:var(--code-bg);color:var(--code-text);border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;font-family:"D2Coding","Consolas","Menlo",monospace;font-size:14px;line-height:1.55;margin:0 0 14px}
+pre.code{background:var(--code-bg);color:var(--code-text);border-radius:12px;padding:16px;overflow-x:auto;font-family:var(--f-code);font-size:13.5px;line-height:1.6;margin:0 0 16px}
+.hl-kw{color:var(--hl-kw);font-weight:700}.hl-str{color:var(--hl-str)}.hl-num{color:var(--hl-num)}.hl-com{color:var(--hl-com);font-style:italic}.hl-fn{color:var(--hl-fn)}
 .blanks{display:grid;gap:8px}
 .blank{display:flex;align-items:center;gap:8px}
-.blank label{min-width:56px;font-weight:600;font-size:14px;color:var(--muted)}
-.blank input{flex:1;min-width:0;font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
-.blank input:focus{outline:2px solid var(--accent);outline-offset:0}
+.blank label{min-width:56px;font-weight:700;font-size:14px;color:var(--muted)}
+.blank input{flex:1;min-width:0;font:inherit;font-size:15px;padding:10px 12px;border:1px solid transparent;border-radius:10px;background:var(--field);color:var(--text)}
+.blank input:focus{outline:2px solid var(--accent);outline-offset:0;background:var(--card)}
 .blank input.ok{border-color:var(--ok);background:var(--ok-soft)}
 .blank input.bad{border-color:var(--bad);background:var(--bad-soft)}
 .actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.result{margin-top:14px;border-radius:10px;padding:14px 16px;display:none}
+.result{margin-top:14px;border-radius:12px;padding:14px 16px;display:none}
 .result.show{display:block}
 .result.ok{background:var(--ok-soft);border:1px solid var(--ok)}
 .result.bad{background:var(--bad-soft);border:1px solid var(--bad)}
 .result.part{background:var(--warn-soft);border:1px solid var(--warn)}
-.result .verdict{font-weight:800;margin-bottom:6px}
+.result .verdict{font-weight:700;margin-bottom:6px}
 .result.ok .verdict{color:var(--ok)} .result.bad .verdict{color:var(--bad)} .result.part .verdict{color:var(--warn)}
 .result .ans{margin:4px 0 10px;font-size:15px}
-.result .ans code{font-family:"D2Coding","Consolas",monospace;background:var(--card);padding:1px 6px;border-radius:4px;border:1px solid var(--line)}
+.result .ans code{font-family:var(--f-code);background:var(--card);padding:1px 6px;border-radius:4px;border:1px solid var(--line)}
 .result .exp{font-size:15px;border-top:1px solid var(--line);padding-top:10px}
-.result .exp pre{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto;font-family:"D2Coding","Consolas",monospace;font-size:13px;white-space:pre}
-.result .exp code{font-family:"D2Coding","Consolas",monospace}
+.result .exp pre{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-family:var(--f-code);font-size:13px;white-space:pre}
+.result .exp code{font-family:var(--f-code)}
 .override{font-size:13px;padding:5px 10px;margin-top:8px}
+/* red-pen grading: circle the number when right, triangle when partial, slash when wrong; handwritten score by the points */
+.card[data-mark] .qnum::before{content:"";position:absolute;pointer-events:none}
+.card[data-mark="ok"] .qnum::before{left:-9px;top:-5px;width:38px;height:36px;border:2.5px solid var(--pen);border-radius:50%;transform:rotate(-8deg)}
+.card[data-mark="part"] .qnum::before{content:"△";left:-8px;top:-14px;font-family:var(--f-pen);font-size:46px;line-height:1;color:var(--pen);font-weight:400}
+.card[data-mark="bad"] .qnum::before{left:-6px;top:12px;width:40px;height:2.5px;background:var(--pen);transform:rotate(-55deg);border-radius:2px}
+.card[data-mark] .qnum{margin-right:6px}
+.card[data-mark] .pts::before{content:attr(data-score);font-family:var(--f-pen);font-size:32px;line-height:1;color:var(--pen);margin-right:8px;vertical-align:-3px}
 #final{display:none}
 #final.show{display:block}
-.score-big{font-size:48px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.score-big{font-size:48px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
 .pass{color:var(--ok)} .fail{color:var(--bad)}
 .cat-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:12px}
 .cat-table th,.cat-table td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left}
@@ -90,25 +111,49 @@ pre.code{background:var(--code-bg);color:var(--code-text);border:1px solid var(-
 .meter i{display:block;height:100%;background:var(--accent)}
 .note{font-size:13px;color:var(--muted)}
 footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}
-@media (max-width:560px){header.top h1{font-size:21px}.card{padding:16px}.score-big{font-size:40px}}
+@media (max-width:560px){.phead h1{font-size:22px}.card{padding:18px}.score-big{font-size:40px}}
 </style>
 <style>
-.menu{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.menu .tab{font-size:16px;padding:9px 16px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
-.tabs .tab{font-size:14px;padding:6px 11px}
-.tab{padding:8px 13px;border-radius:10px;font-weight:700;font-size:15px}
+/* GNB: top bar on wide screens, the menu moves to a bottom tab bar on phones */
+.gnb{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+.gnb-in{max-width:1080px;margin:0 auto;height:var(--gnb-h);display:flex;align-items:center;gap:24px;padding:0 16px}
+.brand{display:flex;flex-direction:column;line-height:1.25;color:var(--text);text-decoration:none;white-space:nowrap}
+.brand b{font-size:16px}
+.brand small{font-size:11px;color:var(--muted)}
+.gmenu{display:flex;gap:2px;flex:1;min-width:0}
+.gitem{border:0;background:none;padding:8px 12px;border-radius:10px;font-weight:700;font-size:15px;color:var(--muted);display:flex;align-items:center;gap:6px;position:relative;white-space:nowrap}
+.gitem:hover{background:var(--bg);color:var(--text)}
+.gitem.active{color:var(--accent);background:var(--accent-soft)}
+.gitem .badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fff;font-size:11px;line-height:18px;text-align:center}
+.themeBtn{margin-left:auto;flex:none}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 4px;padding-bottom:4px;scrollbar-width:thin}
+.tab{flex:none;padding:7px 14px;border-radius:999px;font-weight:700;font-size:14px;white-space:nowrap}
 .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
 :root[data-theme="dark"] .tab.active{color:#0d1220}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab.active{color:#0d1220}}
 .tab small{font-weight:500;margin-left:6px;opacity:.85}
-.tab.special{border-style:dashed}
-.tab .badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--bad);color:#fff;font-size:12px;line-height:20px}
+@media (max-width:720px){
+  .gnb{position:static}
+  .gnb-in{height:52px}
+  .gmenu{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);gap:0;padding:4px max(4px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px))}
+  .gitem{flex-direction:column;gap:0;font-size:11px;padding:6px 0;border-radius:8px}
+  .gitem .ic{font-size:19px;line-height:1.3}
+  .gitem.active{background:none}
+  .gitem .badge{position:absolute;top:2px;left:calc(50% + 6px);font-size:10px;line-height:16px;min-width:16px;padding:0 4px}
+  .bar,.rbar{top:0}
+  .card{scroll-margin-top:110px}
+  .wrap{padding-bottom:120px}
+}
 .pager{display:flex;justify-content:space-between;gap:8px;margin-top:4px}
 .view{display:none}
 .view.active{display:block}
 .overview{width:100%;border-collapse:collapse;font-size:14px}
-.overview th,.overview td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.overview th,.overview td{border-bottom:1px solid var(--line);padding:9px 6px;text-align:center;font-variant-numeric:tabular-nums}
+.overview th:first-child,.overview td:first-child{text-align:left}
+.overview thead th{font-size:12px;color:var(--muted);font-weight:500}
+.overview tbody th{padding-top:18px;text-align:left}
+.overview a{color:var(--accent);font-weight:700;text-decoration:none}
+.overview a:hover{text-decoration:underline}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
 .filters select,.filters input{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
 .filters input[type=search]{flex:1;min-width:160px}
@@ -139,21 +184,32 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
 .weak .row{display:grid;grid-template-columns:110px 1fr 60px;gap:8px;align-items:center;font-size:14px}
 .weak .row .meter i{background:var(--bad)}
 .empty{text-align:center;color:var(--muted);padding:30px 10px}
-.rbar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:14px;display:none}
+.rbar{position:sticky;top:var(--gnb-h);z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:14px;display:none}
 .rbar.show{display:block}
 .banner{border-color:var(--warn);background:var(--warn-soft)}
 .banner .actions{margin-top:8px}
 @media (max-width:560px){.cmp{grid-template-columns:1fr}.weak .row{grid-template-columns:80px 1fr 50px}}
-@media print{.bar,.rbar,.tabs,.filters,.actions,button,footer,#setFooter{display:none!important}.card{break-inside:avoid;border-color:#ccc}body{background:#fff}}
+@media print{.gnb,.phead,.bar,.rbar,.tabs,.filters,.actions,button,footer,#setFooter{display:none!important}.card{break-inside:avoid;border-color:#ccc}body{background:#fff}}
 </style>
 </head>
 <body>
+<header class="gnb">
+  <div class="gnb-in">
+    <a class="brand" href="#set1"><b>정처기 실기 모의고사</b><small>2026년 정기기사 제3회 대비</small></a>
+    <nav class="gmenu" id="menu" aria-label="주 메뉴">
+      <button class="gitem" id="menu-exam"><span class="ic">📝</span>모의고사</button>
+      <button class="gitem" id="menu-calc"><span class="ic">🧮</span>이론계산</button>
+      <button class="gitem" id="tab-retest"><span class="ic">🔁</span>오답 재시험<span class="badge" id="badge-retest" style="display:none"></span></button>
+      <button class="gitem" id="tab-note"><span class="ic">📒</span>오답노트<span class="badge" id="badge-note" style="display:none"></span></button>
+      <button class="gitem" id="tab-report"><span class="ic">📊</span>성적표</button>
+    </nav>
+    <button class="themeBtn" title="테마 전환" aria-label="테마 전환">🌓</button>
+  </div>
+</header>
 <div class="wrap">
-  <header class="top">
-    <div class="kicker">2026년 정기기사 제3회 대비 · 정보처리기사 실기(필답형)</div>
-    <h1>정보처리기사 실기 예상문제 모의고사 (제1회~제10회, 총 200문항)</h1>
-    <p>회차별 20문항 · 문항당 5점 · 100점 만점 · 60점 이상 합격 · 답안·점수·남은 시간은 자동 저장되며, 틀린 문제는 자동으로 <b>오답노트</b>에 모이고 <b>오답 재시험</b>으로 다시 풀 수 있습니다. <b>이론계산</b>에서는 스케줄링·페이지 교체·서브넷 등 계산 문제만 유형별 10문항씩 따로 연습할 수 있습니다.</p>
-    <nav class="menu" id="menu"><button class="tab" id="menu-exam">📝 모의고사</button><button class="tab" id="menu-calc">🧮 이론계산</button></nav>
+  <header class="phead">
+    <h1 id="pTitle">모의고사</h1>
+    <p id="pDesc"></p>
     <nav class="tabs" id="tabs"></nav>
     <div class="card banner" id="storageWarn" style="display:none;margin:10px 0 0">⚠️ <b>이 브라우저에서는 기록이 저장되지 않습니다.</b> 시크릿 창이거나 브라우저 설정에서 사이트 데이터 저장이 차단된 것 같습니다. 지금 풀이는 가능하지만 새로고침하거나 창을 닫으면 답안·점수·오답노트가 사라집니다.</div>
     <div class="card banner" id="syncWarn" style="display:none;margin:10px 0 0">🔄 다른 탭(창)에서 이 모의고사 기록이 변경되었습니다.<div class="actions"><button class="primary" id="syncLoad">최신 기록 불러오기</button><button id="syncIgnore">이 탭 기록 유지</button></div></div>
@@ -167,10 +223,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
         <span>현재 점수 <b id="cur">0</b>점</span>
         <span id="timerWrap">남은 시간 <b id="timer">2:30:00</b></span>
       </div>
-      <div style="display:flex;gap:6px">
-        <button class="themeBtn" title="테마 전환">🌓</button>
-        <button id="submitAll" class="primary">전체 제출·채점</button>
-      </div>
+      <button id="submitAll" class="primary">전체 제출·채점</button>
     </div>
     <div class="nav" id="nav"></div>
   </div>
@@ -182,11 +235,10 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
     <div class="rbar" id="rbar">
       <div class="bar-inner">
         <div class="stats"><span><b>오답 재시험</b></span><span>제출 <b id="rDone">0</b>/<b id="rTotal">0</b></span><span>정답 <b id="rOk">0</b></span></div>
-        <div style="display:flex;gap:6px"><button class="themeBtn" title="테마 전환">🌓</button><button id="rSubmitAll" class="primary">전체 제출·채점</button></div>
+        <button id="rSubmitAll" class="primary">전체 제출·채점</button>
       </div>
     </div>
     <div class="card" id="rSetup">
-      <div class="qhead"><span class="qnum">🔁 오답 재시험</span></div>
       <p class="qtext" id="rInfo"></p>
       <div class="filters">
         <label>범위 <select id="rScope"><option value="open">미해결 오답만</option><option value="all">오답노트 전체(극복 포함)</option></select></label>
@@ -203,8 +255,8 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
   <!-- 오답노트 -->
   <section class="view" id="view-note">
     <div class="card">
-      <div class="qhead"><span class="qnum">📒 오답노트</span><span class="pts" id="nCount"></span></div>
-      <p class="note" style="margin:0">틀린 문제가 자동으로 저장됩니다(이 브라우저에 보관되어 새로고침·재실행 후에도 유지). 문제마다 <b>내 답 / 정답 / 해설</b>과 함께 <b>핵심 개념·관련 이론·함정 포인트·암기 팁</b>을 정리했습니다.</p>
+      <div class="qhead"><b>기록 현황</b><span class="pts" id="nCount"></span></div>
+      <p class="note" style="margin:0">틀린 문제는 이 브라우저에 자동 저장되어 새로고침하거나 다시 열어도 남아 있습니다.</p>
       <div id="weak"></div>
       <div class="filters">
         <label>상태 <select id="nStatus"><option value="all">전체</option><option value="open">미해결</option><option value="done">극복</option></select></label>
@@ -235,9 +287,11 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--accent);font-siz
     <p class="note" style="margin:12px 0 0">※ 회차마다 답안(입력 중인 답 포함)·채점 결과·남은 시간이 <b>이 브라우저에 자동 저장</b>되어, 새로고침하거나 나중에 다시 열어도 이어서 풀 수 있습니다(보고 있는 회차만 타이머가 흐름). 기록을 지우려면 [이 회차 다시 풀기] 또는 [전체 회차 기록 초기화]를 누르세요. 틀리거나 부분 정답인 문제는 <b>오답노트</b>에 자동 저장됩니다. 자동 채점은 띄어쓰기·대소문자(용어 문항)를 무시하고 괄호 안팎 표기도 인정합니다. 의미상 맞는데 오답 처리되면 <b>[내 답 정답 인정]</b>을 누르세요(오답노트에서도 빠집니다). 코드 실행 결과 문항은 대소문자와 값 사이 띄어쓰기를 구분합니다. 빈칸이 여러 개인 문항에서 <b>Enter</b>는 다음 칸으로 이동하고, 마지막 칸에서 누르면 제출됩니다.</p>
   </div>
 
-  <section class="card" id="overviewCard">
-    <div class="note">전체 성적표</div>
-    <div class="tblwrap"><table class="overview" id="overview"></table></div>
+  <!-- 성적표 -->
+  <section class="view" id="view-report">
+    <section class="card" id="overviewCard">
+      <div class="tblwrap"><table class="overview" id="overview"></table></div>
+    </section>
   </section>
   <footer>본 문제는 최근 5년(2021~2026년 2회) 출제 경향을 분석해 만든 예상 문제이며 실제 시험 문제가 아닙니다.</footer>
 </div>
@@ -7153,7 +7207,27 @@ NOTES.push([
       <div class="qtext">${q.q}</div>
       ${q.code ? `<pre class="code"><code></code></pre>` : ''}`;
   }
-  function fillCode(card, q){ const c = card.querySelector('pre.code code'); if (c) c.textContent = q.code.replace(/^\n/,'').replace(/\s+$/,''); }
+  // light syntax colors for the code blocks (C / Java / Python); the text itself stays exactly as written
+  const KW = {
+    c: 'auto break case char const continue default do double else enum extern float for goto if int long register return short signed sizeof static struct switch typedef union unsigned void volatile while include define NULL',
+    java: 'abstract boolean break byte case catch char class continue default do double else extends final finally float for if implements import instanceof int interface long new null package private protected public return short static super switch this throw throws try void while true false String',
+    py: 'and as assert break class continue def del elif else except False finally for from global if import in is lambda None nonlocal not or pass raise return True try while with yield print range len self'
+  };
+  const KWSET = Object.fromEntries(Object.entries(KW).map(([k, v]) => [k, new Set(v.split(' '))]));
+  function highlight(code, cat){
+    const lang = /python/i.test(cat) ? 'py' : /java/i.test(cat) ? 'java' : 'c';
+    const com = lang === 'py' ? '#.*' : '\\/\\/.*|\\/\\*[\\s\\S]*?\\*\\/';
+    const re = new RegExp(`(${com})|("(?:\\\\.|[^"\\\\\\n])*"|'(?:\\\\.|[^'\\\\\\n])*')|\\b(\\d+(?:\\.\\d+)?[fFlL]?)\\b|([A-Za-z_]\\w*)(?=\\s*\\()|([A-Za-z_]\\w*)`, 'g');
+    let out = '', at = 0, m;
+    while ((m = re.exec(code))){
+      out += esc(code.slice(at, m.index)); at = re.lastIndex;
+      const t = esc(m[0]);
+      out += m[1] ? `<span class="hl-com">${t}</span>` : m[2] ? `<span class="hl-str">${t}</span>` : m[3] ? `<span class="hl-num">${t}</span>`
+        : KWSET[lang].has(m[0]) ? `<span class="hl-kw">${t}</span>` : m[4] ? `<span class="hl-fn">${t}</span>` : t;
+    }
+    return out + esc(code.slice(at));
+  }
+  function fillCode(card, q){ const c = card.querySelector('pre.code code'); if (c) c.innerHTML = highlight(q.code.replace(/^\n/,'').replace(/\s+$/,''), q.cat); }
 
   // builds an answerable card; onSubmit(vals, marks) returns nothing
   function makeCard(idp, q, n, head, onSubmit){
@@ -7189,6 +7263,7 @@ NOTES.push([
     card.querySelectorAll('.blank input').forEach(inp => { inp.value=''; inp.disabled=false; inp.classList.remove('ok','bad'); });
     card.querySelector('.sub').disabled = false;
     const r = card.querySelector('.result'); r.className='result'; r.innerHTML='';
+    delete card.dataset.mark;
   }
   function showResult(card, q, si, i, marks, override, onOverride, extra){
     const box = card.querySelector('.result');
@@ -7196,6 +7271,7 @@ NOTES.push([
     const kind = sc === PTS ? 'ok' : (sc > 0 ? 'part' : 'bad');
     const verdict = override ? '⭕ 정답 인정 (수동 채점)' : kind === 'ok' ? '⭕ 정답' : kind === 'part' ? '△ 부분 정답' : '❌ 오답';
     box.className = 'result show ' + kind;
+    card.dataset.mark = kind; card.querySelector('.pts').dataset.score = sc;   // red-pen mark on the number and score
     box.innerHTML = `<div class="verdict">${verdict} · ${sc}점 / ${PTS}점 ${extra||''}</div>
       <div class="ans">정답${q.unordered ? ' (순서 무관)' : ''}:<br>${ansHtml(q)}</div>
       <div class="exp"><b>해설</b><br>${q.exp}</div>
@@ -7264,13 +7340,8 @@ NOTES.push([
       main.appendChild(card);
     });
   });
-  [['retest','🔁 오답 재시험'],['note','📒 오답노트']].forEach(([v, label]) => {
-    const t = document.createElement('button');
-    t.className = 'tab special'; t.id = 'tab-'+v;
-    t.innerHTML = label + `<span class="badge" id="badge-${v}" style="display:none"></span>`;
-    t.addEventListener('click', () => show(v, true));
-    $('menu').appendChild(t);
-  });
+  ['retest','note','report'].forEach(v => $('tab-'+v).addEventListener('click', () => show(v, true)));
+  document.querySelector('.brand').addEventListener('click', e => { e.preventDefault(); show(lastSet.exam, true); });
   ['exam','calc'].forEach(g => {
     if (!groupSets(g).length) $('menu-'+g).style.display = 'none';
     $('menu-'+g).addEventListener('click', () => show(lastSet[g], true));
@@ -7296,10 +7367,19 @@ NOTES.push([
     });
   }
 
+  const PAGE = {
+    exam: ['모의고사', '회차별 20문항 · 문항당 5점 · 2시간 30분 · 60점 이상 합격'],
+    calc: ['이론계산', '스케줄링·페이지 교체·서브넷·디스크 등 계산 문제 · 유형별 10문항 · 시간 제한 없음'],
+    retest: ['오답 재시험', '틀린 문제만 다시 풉니다. 맞히면 극복으로 표시되고, 또 틀리면 틀린 횟수가 늘어납니다.'],
+    note: ['오답노트', '틀린 문제마다 내 답, 정답, 해설과 핵심 개념·함정 포인트·암기 팁을 모아 봅니다.'],
+    report: ['성적표', '모의고사 회차와 이론계산 유형별 제출 현황과 점수입니다. 이름을 누르면 해당 문제로 이동합니다.']
+  };
   function show(v, scroll){
     view = v;
     document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab, .gitem').forEach(x => x.classList.remove('active'));
+    const [title, desc] = PAGE[isSet() ? groupOf(v) : v];
+    $('pTitle').textContent = title; $('pDesc').textContent = desc;
     if (isSet()){
       const g = groupOf(v), grp = groupSets(g), unit = g === 'calc' ? '유형' : '회차';
       lastSet[g] = v;
@@ -7312,12 +7392,11 @@ NOTES.push([
       buildNav(); updateSet(); renderTimer(); checkTimeUp();
     } else {
       $('view-'+v).classList.add('active'); $('tab-'+v).classList.add('active');
-      if (v === 'note') renderNote(); else renderRetestSetup();
+      if (v === 'note') renderNote(); else if (v === 'retest') renderRetestSetup(); else renderOverview();
     }
     tabs.style.display = isSet() ? '' : 'none';
     $('setBar').style.display = isSet() ? '' : 'none';
     $('setFooter').style.display = isSet() ? '' : 'none';
-    $('overviewCard').style.display = v === 'note' ? 'none' : '';
     try { history.replaceState(null, '', isSet() ? hashOf(v) : '#' + v); } catch(e) {}
     if (scroll) window.scrollTo({top:0, behavior:'smooth'});
   }
@@ -7688,14 +7767,14 @@ NOTES.push([
   $('syncIgnore').addEventListener('click', () => { syncPending = false; $('syncWarn').style.display = 'none'; saveProgress(); });
 
   refreshBadges();
-  // 3: '#setN', '#calcN', '#sXqY' (question links), '#note', '#retest'
+  // 3: '#setN', '#calcN', '#sXqY' (question links), '#note', '#retest', '#report'
   const h = location.hash;
   const m = h.match(/^#(set|calc)(\d+)$/), mq = h.match(/^#s(\d+)q(\d+)$/);
   const fromHash = m && groupSets(m[1] === 'set' ? 'exam' : 'calc')[+m[2] - 1];
   if (mq && +mq[1] < S.length){
     show(+mq[1], false);
     const el = $(`s${mq[1]}q${mq[2]}`); if (el) setTimeout(() => el.scrollIntoView({block:'start'}), 0);
-  } else show(fromHash !== undefined && fromHash !== null ? fromHash : h === '#note' ? 'note' : h === '#retest' ? 'retest' : 0, false);
+  } else show(fromHash !== undefined && fromHash !== null ? fromHash : ['#note', '#retest', '#report'].includes(h) ? h.slice(1) : 0, false);
 })();
 </script>
 </body>
